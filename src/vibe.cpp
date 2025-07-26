@@ -124,7 +124,7 @@ private:
 int main(const int argc, const char *argv[]) {
     try {
         // Read JSON file
-        ifstream f("data/vibe.json");
+        ifstream f("./data/vibe.json");
         json data = json::parse(f);
         
         // Directly convert JSON data to struct
@@ -134,17 +134,23 @@ int main(const int argc, const char *argv[]) {
         // Get image parameters (using [] operator directly)
         int width = reg_info.reg_image_width[0];
         int height = reg_info.reg_image_height[0];
+
         string image_path = img_info.image_path;
+        string image_format = img_info.image_format;
         
-        // Print image and register information using unified print_values function
+        // Print image and register` information using unified print_values function
+        cout << "=== Image Information ===" << endl;
         img_info.print_values();
+        cout << "=== Register Information ===" << endl;
         reg_info.print_values();
         
         // Generate random image data
         cout << "Generating random image data..." << endl;
-        string command = "python ./py/generate_random_image.py --width " + to_string(width) + 
-                        " --height " + to_string(height) + 
-                        " --format GRAY --output " + image_path;
+        string command = string("python ./py/generate_random_image.py") +
+            " --width " + to_string(width) + 
+            " --height " + to_string(height) + 
+            " --format " + image_format +
+            " --output " + image_path;
         
         int result = system(command.c_str());
         if (result == 0) {
