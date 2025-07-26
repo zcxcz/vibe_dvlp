@@ -1,0 +1,84 @@
+# Interaction Log
+
+## Date
+2024-01-09
+
+## Completed Tasks
+1. Created interaction log file to record project progress and interactions
+2. Implemented JSON parsing functionality in vibe.cpp:
+   - Fixed syntax errors
+   - Added file reading and parsing
+   - Implemented image and register information parsing
+   - Added error handling mechanisms
+3. Fixed design issues in RegisterInfo struct:
+   - Modified reg_filter_coeff to RegInfo type
+   - Used variant to support different types of reg_initial_value
+   - Corrected related data access code
+4. Optimized JSON parsing code:
+   - Moved NLOHMANN_DEFINE_TYPE_INTRUSIVE macro inside struct
+   - Added member function form serialization functions for RegInfo struct
+   - Simplified JSON parsing logic in main function
+5. Further optimized RegInfo struct and data access:
+   - Removed unused member function form serialization functions
+   - Added get_values() helper function to uniformly handle initial_value
+   - Simplified value acquisition logic in main function
+6. Created project file generation script:
+   - Created generate_vibe_files.sh script
+   - Implemented functionality to automatically generate vibe.json and vibe.cpp files
+   - Maintained file content consistency with current version
+7. Final optimization:
+   - Removed global to_json and from_json functions
+   - Used NLOHMANN_DEFINE_TYPE_INTRUSIVE macro in RegInfo struct
+   - Updated generation script to reflect latest code changes
+8. Created Random Image Generator:
+   - Created generate_random_image.py script using Python
+   - Supported multiple bit depths (8, 12, 16 bits)
+   - Provided command line parameter interface
+   - Created test script test_random_image.py for demonstrating functionality
+9. Integrated random image generation functionality into main program:
+   - Added code to call random image generator in main function of vibe.cpp
+   - Used image_path from JSON as output file name
+   - Generated images based on width and height parameters in register_info
+   - Updated generate_vibe_files.sh script to keep in sync
+10. Optimized RegInfo struct to improve user experience:
+    - Added is_single_value() method to automatically determine register value type
+    - Overloaded [] operator to support seamless access to single values or array elements
+    - Added size() method to get the number of values
+    - Simplified code in main function, eliminating the need for users to manually distinguish types
+    - Updated generate_vibe_files.sh script to keep in sync
+11. Further optimized RegInfo struct, simplifying interface:
+    - Removed redundant methods get_single_value(), get_array_values(), and get_values()
+    - Retained only [] operator overloading and print_values() unified printing function
+    - Simplified register value access logic in main function
+    - Updated generate_vibe_files.sh script to keep in sync
+12. Added build system support for vibe.cpp project:
+    - Created CMakeLists.txt, supporting C++17 standard, including header directory configuration
+    - Created Makefile, compatible with Windows and Unix-like systems, providing clean/run/debug/release/install/help targets
+    - Both build systems include json.hpp existence check
+13. Fixed json.hpp inclusion issue: Added json.hpp existence check in CMakeLists.txt and Makefile, ensuring correct inclusion of header file during build and providing error提示 information.
+14. Optimized file update mechanism: Created update_files.sh intelligent update script, using sed commands for precise replacement to avoid complete file rewriting:
+    - Supported selective updating of specific files (cmake/makefile/reginfo/main)
+    - Used sed commands for precise content replacement, avoiding repeated processing of entire files
+    - Provided detailed log output and error handling
+    - Modular design to reduce data processing volume
+
+## Pending Tasks
+1. To be补充
+
+## Interaction Records
+1. User requested creation of interaction log file
+2. User requested extraction of vibe.json content through json library in vibe.cpp
+3. User pointed out incorrect definition of reg_filter_coeff in RegisterInfo struct
+4. User asked about variant functionality and requested use of macros to implement struct and JSON bridging
+5. User pointed out macro position issue and requested code optimization
+6. User pointed out unused serialization function in RegInfo and requested optimization of initial_value access method
+7. User requested creation of shell script to generate project files
+8. User pointed out unused global serialization functions and requested removal
+9. User requested creation of random image generator
+10. User requested integration of random image generation functionality into main program
+11. User requested optimization of RegInfo struct's user experience
+12. User requested further optimization of RegInfo struct interface
+13. User requested addition of build system support
+14. User requested fixing of json.hpp inclusion issue
+15. User requested optimization of file update mechanism
+16. User requested updating of generate_vibe_files.sh to sync with interact.log changes and add Makefile and CMakeLists.txt generation
