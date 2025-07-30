@@ -95,11 +95,13 @@ struct RegisterInfo {
     RegInfo reg_image_width;
     RegInfo reg_image_height;
     RegInfo reg_filter_coeff;
-    RegInfo reg_crop_width;
-    RegInfo reg_crop_height;
+    RegInfo reg_crop_start_x;
+    RegInfo reg_crop_start_y;
+    RegInfo reg_crop_end_x;
+    RegInfo reg_crop_end_y;
     RegInfo reg_crop_enable;
     
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RegisterInfo, reg_image_width, reg_image_height, reg_filter_coeff, reg_crop_width, reg_crop_height, reg_crop_enable)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RegisterInfo, reg_image_width, reg_image_height, reg_filter_coeff, reg_crop_start_x, reg_crop_start_y, reg_crop_end_x, reg_crop_end_y, reg_crop_enable)
     
     // Print all register information
     void print_values() const {
@@ -109,8 +111,10 @@ struct RegisterInfo {
         print_reg_info("Reg Image Width", reg_image_width);
         print_reg_info("Reg Image Height", reg_image_height);
         print_reg_info("Reg Filter Coeff", reg_filter_coeff);
-        print_reg_info("Reg Crop Width", reg_crop_width);
-        print_reg_info("Reg Crop Height", reg_crop_height);
+        print_reg_info("Reg Crop Start X", reg_crop_start_x);
+        print_reg_info("Reg Crop Start Y", reg_crop_start_y);
+        print_reg_info("Reg Crop End X", reg_crop_end_x);
+        print_reg_info("Reg Crop End Y", reg_crop_end_y);
         print_reg_info("Reg Crop Enable", reg_crop_enable);
         
         cout << "==========================" << endl;
@@ -167,24 +171,27 @@ int main(const int argc, const char *argv[]) {
         
         // Crop processing
         cout << "Starting crop processing..." << endl;
-        int crop_width = reg_info.reg_crop_width[0];
-        int crop_height = reg_info.reg_crop_height[0];
+        int crop_start_x = reg_info.reg_crop_start_x[0];
+        int crop_start_y = reg_info.reg_crop_start_y[0];
+        int crop_end_x = reg_info.reg_crop_end_x[0];
+        int crop_end_y = reg_info.reg_crop_end_y[0];
         int crop_enable = reg_info.reg_crop_enable[0];
         
-        string crop_command = string("python ./py/crop_adapter.py") +
-            " ./data/test.img" +
-            " ./data/crop_output.img" +
-            " " + to_string(width) +
-            " " + to_string(height) +
-            " " + to_string(crop_width) +
-            " " + to_string(crop_height) +
-            " " + to_string(crop_enable) +
+        string crop_command = string("python ./py/crop.py") +
+            " ./data/test.txt" +
+            " ./data/crop_data_out.txt" +
+            " " + to_string(crop_start_x) +
+            " " + to_string(crop_start_y) +
+            " " + to_string(crop_end_x) +
+            " " + to_string(crop_end_y) +
+            " " + (crop_enable ? "true" : "false") +
             " " + to_string(img_info.image_data_bitwidth) +
             " " + img_info.image_format;
         
         int crop_result = system(crop_command.c_str());
         if (crop_result == 0) {
             cout << "Crop processing completed successfully" << endl;
+            cout << "Processed image saved to: ./data/crop_data_out.txt" << endl;
         } else {
             cerr << "Failed to execute crop processing" << endl;
         }
