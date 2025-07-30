@@ -185,6 +185,8 @@ int main(const int argc, const char *argv[]) {
             " " + to_string(crop_end_x) +
             " " + to_string(crop_end_y) +
             " " + (crop_enable ? "true" : "false") +
+            " " + to_string(width) +
+            " " + to_string(height) +
             " " + to_string(img_info.image_data_bitwidth) +
             " " + img_info.image_format;
         
