@@ -22,6 +22,24 @@
             "reg_initial_value": [1, 2, 3, 4, 5, 6, 7, 8, 9],
             "reg_value_min": 0,
             "reg_value_max": 255
+        },
+        "reg_crop_width": {
+            "reg_bit_width": 16,
+            "reg_initial_value": 2,
+            "reg_value_min": 1,
+            "reg_value_max": 31
+        },
+        "reg_crop_height": {
+            "reg_bit_width": 16,
+            "reg_initial_value": 2,
+            "reg_value_min": 1,
+            "reg_value_max": 31
+        },
+        "reg_crop_enable": {
+            "reg_bit_width": 1,
+            "reg_initial_value": 1,
+            "reg_value_min": 0,
+            "reg_value_max": 1
         }
     }
 }

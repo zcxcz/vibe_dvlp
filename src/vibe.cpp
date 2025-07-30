@@ -95,8 +95,11 @@ struct RegisterInfo {
     RegInfo reg_image_width;
     RegInfo reg_image_height;
     RegInfo reg_filter_coeff;
+    RegInfo reg_crop_width;
+    RegInfo reg_crop_height;
+    RegInfo reg_crop_enable;
     
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RegisterInfo, reg_image_width, reg_image_height, reg_filter_coeff)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RegisterInfo, reg_image_width, reg_image_height, reg_filter_coeff, reg_crop_width, reg_crop_height, reg_crop_enable)
     
     // Print all register information
     void print_values() const {
@@ -106,6 +109,9 @@ struct RegisterInfo {
         print_reg_info("Reg Image Width", reg_image_width);
         print_reg_info("Reg Image Height", reg_image_height);
         print_reg_info("Reg Filter Coeff", reg_filter_coeff);
+        print_reg_info("Reg Crop Width", reg_crop_width);
+        print_reg_info("Reg Crop Height", reg_crop_height);
+        print_reg_info("Reg Crop Enable", reg_crop_enable);
         
         cout << "==========================" << endl;
     }
@@ -157,6 +163,30 @@ int main(const int argc, const char *argv[]) {
             cout << "Random image generated successfully: " << image_path << endl;
         } else {
             cerr << "Failed to generate random image" << endl;
+        }
+        
+        // Crop processing
+        cout << "Starting crop processing..." << endl;
+        int crop_width = reg_info.reg_crop_width[0];
+        int crop_height = reg_info.reg_crop_height[0];
+        int crop_enable = reg_info.reg_crop_enable[0];
+        
+        string crop_command = string("python ./py/crop_adapter.py") +
+            " ./data/test.img" +
+            " ./data/crop_output.img" +
+            " " + to_string(width) +
+            " " + to_string(height) +
+            " " + to_string(crop_width) +
+            " " + to_string(crop_height) +
+            " " + to_string(crop_enable) +
+            " " + to_string(img_info.image_data_bitwidth) +
+            " " + img_info.image_format;
+        
+        int crop_result = system(crop_command.c_str());
+        if (crop_result == 0) {
+            cout << "Crop processing completed successfully" << endl;
+        } else {
+            cerr << "Failed to execute crop processing" << endl;
         }
         
     } catch (json::parse_error& e) {
