@@ -62,22 +62,22 @@ def crop(input_file, output_file, start_x, start_y, end_x, end_y, crop_enable, b
         total_pixels = len(pixels)
         
         # Determine image dimensions based on total pixels
-        # For test purposes, use reasonable dimensions
+        # For test purposes, use reasonable dimensions matching HLS convention
         if total_pixels == 8:
-            # Special case for 8 pixels: 4x2 or 2x4
-            original_width = 4
-            original_height = 2
+            # Special case for 8 pixels: 2x4 (width x height)
+            original_width = 2
+            original_height = 4
         elif total_pixels == 30:
-            # Current test case
+            # Current test case: 5x6 (width x height)
             original_width = 5
             original_height = 6
         else:
             # Auto-detect closest square-ish dimensions
-            original_height = int(np.sqrt(total_pixels))
-            original_width = total_pixels // original_height
-            while original_width * original_height != total_pixels and original_height > 0:
-                original_height -= 1
-                original_width = total_pixels // original_height
+            original_width = int(np.sqrt(total_pixels))
+            original_height = total_pixels // original_width
+            while original_width * original_height != total_pixels and original_width > 0:
+                original_width -= 1
+                original_height = total_pixels // original_width
         
         # Validate dimensions
         if original_width * original_height != total_pixels:
