@@ -62,23 +62,74 @@
     - Provided detailed log output and error handling
     - Modular design to reduce data processing volume
 
-## Pending Tasks
-1. To be补充
+## 今日开发进度 (2024-07-26)
 
-## Interaction Records
-1. User requested creation of interaction log file
-2. User requested extraction of vibe.json content through json library in vibe.cpp
-3. User pointed out incorrect definition of reg_filter_coeff in RegisterInfo struct
-4. User asked about variant functionality and requested use of macros to implement struct and JSON bridging
-5. User pointed out macro position issue and requested code optimization
-6. User pointed out unused serialization function in RegInfo and requested optimization of initial_value access method
-7. User requested creation of shell script to generate project files
-8. User pointed out unused global serialization functions and requested removal
-9. User requested creation of random image generator
-10. User requested integration of random image generation functionality into main program
-11. User requested optimization of RegInfo struct's user experience
-12. User requested further optimization of RegInfo struct interface
-13. User requested addition of build system support
-14. User requested fixing of json.hpp inclusion issue
-15. User requested optimization of file update mechanism
-16. User requested updating of generate_vibe_files.sh to sync with interact.log changes and add Makefile and CMakeLists.txt generation
+### 1. crop.py 功能改进
+**文件位置**: `/home/sheldon/hls_project/vibe_0726/py/crop.py`
+
+#### 修改内容:
+- 移除图像尺寸自动检测逻辑，改为使用传入的宽高参数
+- 简化坐标处理，直接使用寄存器配置
+- 添加image_width和image_height参数
+- 增强坐标验证功能：
+  - 添加坐标范围检查（0 <= 坐标 < 图像宽高）
+  - 添加起始坐标不大于结束坐标的验证
+  - 提供详细的错误提示信息
+
+#### 参数变更:
+```
+旧参数: python crop.py <input_file> <output_file> <start_x> <start_y> <end_x> <end_y> <crop_enable> <bit_depth> [bayer_pattern]
+新参数: python crop.py <input_file> <output_file> <start_x> <start_y> <end_x> <end_y> <crop_enable> <image_width> <image_height> <bit_depth> [bayer_pattern]
+```
+
+### 2. vibe.cpp 适配修改
+**文件位置**: `/home/sheldon/hls_project/vibe_0726/src/vibe.cpp`
+
+#### 修改内容:
+- 在crop_command字符串中添加image_width和image_height参数
+- 确保crop.py调用时包含图像宽高信息
+
+### 3. 测试环境建立
+**测试文件夹**: `/home/sheldon/hls_project/vibe_0726/test/`
+
+#### 创建文件:
+- `crop.cmd` - 系统性测试脚本
+- `README.md` - 测试使用说明文档
+
+#### 测试内容:
+- 单点坐标测试：6个测试用例
+- 矩形区域测试：5个测试用例
+- 边界条件测试：3个测试用例
+
+#### 测试结果:
+- 所有14个测试用例全部通过
+- 验证坐标验证功能正常工作
+- 确认边界条件处理正确
+
+### 4. 验证结果
+- 正常裁剪功能：✅ 通过
+- 坐标验证功能：✅ 通过
+- 边界条件处理：✅ 通过
+- 错误提示信息：✅ 通过
+
+## 后续使用
+测试脚本已保存，可通过以下命令运行：
+```bash
+cd /home/sheldon/hls_project/vibe_0726/test
+python crop.cmd
+```
+
+## 状态总结
+所有修改已完成并通过测试，crop.py功能更加健壮安全，具备完善的坐标验证和错误处理机制。
+
+## Interaction Records (更新)
+17. User requested saving today's development progress to log/interact.log
+18. User requested creating systematic test suite for crop.py functionality
+19. User requested updating coordinate validation logic in crop.py
+20. User requested fixing parameter passing in vibe.cpp for crop.py
+21. User requested creating test folder with crop.cmd and README.md
+22. User requested running comprehensive tests and documenting results
+
+## Pending Tasks
+1. 继续完善其他功能模块测试
+2. 优化性能测试用例

@@ -10,10 +10,13 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/json.hpp")
 endif()
 
 # Add executable
-add_executable(vibe src/vibe.cpp)
+add_executable(vibe src/vibe.cpp src/crop.cpp)
 
 # Include header directories
-target_include_directories(vibe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(vibe PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hls_lib
+)
 
 # Add compilation options
 target_compile_options(vibe PRIVATE

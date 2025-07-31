@@ -174,6 +174,30 @@ vibe/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/vibe.dir/build.make CMakeFiles/vibe.dir/build
 .PHONY : vibe/fast
 
+src/crop.o: src/crop.cpp.o
+.PHONY : src/crop.o
+
+# target to build an object file
+src/crop.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vibe.dir/build.make CMakeFiles/vibe.dir/src/crop.cpp.o
+.PHONY : src/crop.cpp.o
+
+src/crop.i: src/crop.cpp.i
+.PHONY : src/crop.i
+
+# target to preprocess a source file
+src/crop.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vibe.dir/build.make CMakeFiles/vibe.dir/src/crop.cpp.i
+.PHONY : src/crop.cpp.i
+
+src/crop.s: src/crop.cpp.s
+.PHONY : src/crop.s
+
+# target to generate assembly for a file
+src/crop.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/vibe.dir/build.make CMakeFiles/vibe.dir/src/crop.cpp.s
+.PHONY : src/crop.cpp.s
+
 src/vibe.o: src/vibe.cpp.o
 .PHONY : src/vibe.o
 
@@ -211,6 +235,9 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... vibe"
+	@echo "... src/crop.o"
+	@echo "... src/crop.i"
+	@echo "... src/crop.s"
 	@echo "... src/vibe.o"
 	@echo "... src/vibe.i"
 	@echo "... src/vibe.s"

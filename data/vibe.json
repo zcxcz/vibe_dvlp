@@ -2,7 +2,7 @@
   "image_info": {
     "image_path": "./data/test.txt",
     "image_format": "BAYER",
-    "image_data_bitwidth": 8
+    "image_data_bitwidth": 10
   },
   "register_info": {
     "reg_image_width": {
@@ -44,7 +44,7 @@
     "reg_crop_start_y": {
       "reg_bit_width": 16,
       "reg_initial_value": [
-        2
+        0
       ],
       "reg_value_min": 0,
       "reg_value_max": 31
@@ -60,7 +60,7 @@
     "reg_crop_end_y": {
       "reg_bit_width": 16,
       "reg_initial_value": [
-        3
+        1
       ],
       "reg_value_min": 0,
       "reg_value_max": 31
