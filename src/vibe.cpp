@@ -82,6 +82,8 @@ struct ImageInfo {
     string image_path;
     string image_format;
     int image_data_bitwidth;
+    int generate_random_image;
+    string random_image_path;
     
     // Print image information
     void print_values() const {
@@ -89,10 +91,12 @@ struct ImageInfo {
         cout << "Image Path: " << image_path << endl;
         cout << "Image Format: " << image_format << endl;
         cout << "Image Data Bitwidth: " << image_data_bitwidth << endl;
+        cout << "Generate Random Image: " << (generate_random_image ? "Yes" : "No") << endl;
+        cout << "Random Image Path: " << random_image_path << endl;
         cout << "========================" << endl;
     }
     
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ImageInfo, image_path, image_format, image_data_bitwidth)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ImageInfo, image_path, image_format, image_data_bitwidth, generate_random_image, random_image_path)
 };
 
 struct RegInfo {
@@ -221,24 +225,28 @@ int main(const int argc, const char *argv[]) {
         string image_format = img_info.image_format;
         
         // Print image and register` information using unified print_values function
-        cout << "=== Image Information ===" << endl;
         img_info.print_values();
-        cout << "=== Register Information ===" << endl;
         reg_info.print_values();
         
-        // Generate random image data
-        cout << "Generating random image data..." << endl;
-        string command = string("python3 ./py/generate_random_image.py") +
-            " --width " + to_string(width) + 
-            " --height " + to_string(height) + 
-            " --format " + image_format +
-            " --output " + image_path;
-        
-        int result = system(command.c_str());
-        if (result == 0) {
-            cout << "Random image generated successfully: " << image_path << endl;
+        // 根据generate_random_image属性决定是否生成随机图像
+        if (img_info.generate_random_image == 1) {
+            cout << "Generating random image data..." << endl;
+            image_path = img_info.random_image_path;
+            string command = string("python3 ./py/generate_random_image.py") +
+                " --width " + to_string(width) + 
+                " --height " + to_string(height) + 
+                " --format " + image_format +
+                " --output " + image_path;
+            
+            int result = system(command.c_str());
+            if (result == 0) {
+                cout << "Random image generated successfully: " << image_path << endl;
+            } else {
+                cerr << "Failed to generate random image" << endl;
+                return 1;
+            }
         } else {
-            cerr << "Failed to generate random image" << endl;
+            cout << "Using existing image file: " << image_path << endl;
         }
         
         // 使用crop.h中定义的RegisterHlsInfo结构体
@@ -249,7 +257,7 @@ int main(const int argc, const char *argv[]) {
         hls_regs.crop_start_y = reg_info.reg_crop_start_y[0];
         hls_regs.crop_end_x = reg_info.reg_crop_end_x[0];
         hls_regs.crop_end_y = reg_info.reg_crop_end_y[0];
-        hls_regs.crop_enable = reg_info.reg_crop_enable[0];
+        hls_regs.crop_enable = (reg_info.reg_crop_enable[0] != 0) ? ap_uint<1>(1) : ap_uint<1>(0);
         
         // Python版本crop处理（输出重命名为crop_py_data_out.txt）
         cout << "Starting Python crop processing..." << endl;
@@ -260,7 +268,7 @@ int main(const int argc, const char *argv[]) {
         int crop_enable = reg_info.reg_crop_enable[0];
         
         string crop_command = string("python3 ./py/crop.py") +
-            " ./data/test.txt" +
+            " " + image_path +
             " ./data/crop_py_data_out.txt" +
             " " + to_string(crop_start_x) +
             " " + to_string(crop_start_y) +
@@ -296,7 +304,7 @@ int main(const int argc, const char *argv[]) {
         hls::stream<pixel_t> input_stream;
         hls::stream<pixel_t> output_stream;
         
-        size_t input_count = read_data_to_stream("./data/test.txt", input_stream);
+        size_t input_count = read_data_to_stream(image_path, input_stream);
         crop_hls(input_stream, output_stream, hls_regs);
         size_t output_count = write_stream_to_file("./data/crop_hls_data_out.txt", output_stream);
         

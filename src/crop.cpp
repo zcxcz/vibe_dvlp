@@ -25,26 +25,21 @@ void crop_hls(
     ap_uint<16> y_cnt = 0;
     ap_uint<16> x_cnt = 0;
     
-    for (ap_uint<32> i = 0; i < regs.image_width * regs.image_height; i++) {
-        #pragma HLS PIPELINE II=1
-        
-        if (!input_stream.empty()) {
-            pixel_t data_in = input_stream.read();
-            
-            // 检查是否在裁剪区域内
-            bool x_in_range = (x_cnt >= regs.crop_start_x && x_cnt <= regs.crop_end_x);
-            bool y_in_range = (y_cnt >= regs.crop_start_y && y_cnt <= regs.crop_end_y);
-            bool in_crop_region = (x_in_range && y_in_range);
-            
-            if (in_crop_region) {
-                output_stream.write(data_in);
-            }
-            
-            // 更新行列计数 - 正确的行列遍历
-            x_cnt++;
-            if (x_cnt == regs.image_width) {
-                x_cnt = 0;
-                y_cnt++;
+    for(y_cnt=0;y_cnt<regs.image_height;y_cnt++){
+        for(x_cnt=0;x_cnt<regs.image_width;x_cnt++){
+            #pragma HLS PIPELINE II=1
+            if (!input_stream.empty()) {
+                pixel_t data_in = input_stream.read();
+                
+                // 检查是否在裁剪区域内
+                bool x_in_range = (x_cnt >= regs.crop_start_x && x_cnt <= regs.crop_end_x);
+                bool y_in_range = (y_cnt >= regs.crop_start_y && y_cnt <= regs.crop_end_y);
+                bool in_crop_region = (x_in_range && y_in_range);
+                
+                if (in_crop_region) {
+                    output_stream.write(data_in);
+                }
+                
             }
         }
     }
