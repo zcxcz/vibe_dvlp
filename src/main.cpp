@@ -178,13 +178,8 @@ private:
 int main(const int argc, const char *argv[]) {
     try {
         // 读取JSON配置 - 兼容不同构建目录
-        string config_path = "data/vibe.json";
+        string config_path = "./vibe.json";
         ifstream f(config_path);
-        if (!f.is_open()) {
-            // 尝试相对于可执行文件的路径
-            config_path = "../data/vibe.json";
-            f.open(config_path);
-        }
         if (!f.is_open()) {
             // 尝试工作目录路径
             config_path = "./data/vibe.json";
@@ -208,7 +203,7 @@ int main(const int argc, const char *argv[]) {
         vector<uint16_t> input_image;
         string image_path = img_info.image_path;
         
-        // 生成或读取输入图像
+        // 生成或读取输入图像 - 多路径兼容处理
         if (img_info.generate_random_image == 1) {
             cout << "Generating random image using algorithm model..." << endl;
             input_image = AlgCrop::generate_random_image(width, height, 1023);
@@ -220,10 +215,28 @@ int main(const int argc, const char *argv[]) {
             }
             cout << "Random image generated: " << image_path << endl;
         } else {
-            cout << "Loading existing image: " << image_path << endl;
-            input_image = read_data_to_vector(image_path);
-            if (input_image.empty()) {
-                cerr << "Failed to load image: " << image_path << endl;
+            // 多路径尝试加载图像文件
+            vector<string> image_paths = {
+                image_path,
+                "image.txt",
+                "data/image.txt",
+                "../data/image.txt",
+                "./data/image.txt"
+            };
+            
+            bool loaded = false;
+            for (const auto& path : image_paths) {
+                cout << "Trying to load image: " << path << endl;
+                input_image = read_data_to_vector(path);
+                if (!input_image.empty()) {
+                    cout << "Successfully loaded image: " << path << endl;
+                    loaded = true;
+                    break;
+                }
+            }
+            
+            if (!loaded) {
+                cerr << "Failed to load image from any path" << endl;
                 return 1;
             }
         }
@@ -239,9 +252,22 @@ int main(const int argc, const char *argv[]) {
             reg_info.reg_crop_enable[0] != 0
         );
         
-        if (!AlgCrop::write_image_to_file("./data/alg_crop_data_out.txt", alg_result)) {
-            cerr << "Failed to save algorithm model result" << endl;
-            return 1;
+        // 将算法模型的结果写入文件 - 优先尝试data子文件夹，不存在则当前目录
+        string alg_output_file;
+        string data_path = "data/alg_crop_data_out.txt";
+        
+        // 尝试创建data子文件夹下的文件
+        if (AlgCrop::write_image_to_file(data_path, alg_result)) {
+            alg_output_file = data_path;
+            cout << "Algorithm model result written to " << alg_output_file << endl;
+        } else {
+            // 退回到当前目录创建文件
+            alg_output_file = "alg_crop_data_out.txt";
+            if (!AlgCrop::write_image_to_file(alg_output_file, alg_result)) {
+                cerr << "Failed to write algorithm result" << endl;
+                return 1;
+            }
+            cout << "Algorithm model result written to " << alg_output_file << " (current directory)" << endl;
         }
         cout << "Algorithm model completed. Output: " << alg_result.size() << " pixels" << endl;
         
@@ -271,9 +297,22 @@ int main(const int argc, const char *argv[]) {
         // 将HLS输出转换为vector
         vector<uint16_t> hls_result = stream_to_vector(output_stream);
         
-        if (!write_vector_to_file("./data/hls_crop_data_out.txt", hls_result)) {
-            cerr << "Failed to save HLS model result" << endl;
-            return 1;
+        // 将HLS模型的结果写入文件 - 优先尝试data子文件夹，不存在则当前目录
+        string hls_output_file;
+        string hls_data_path = "data/hls_crop_data_out.txt";
+        
+        // 尝试创建data子文件夹下的文件
+        if (write_vector_to_file(hls_data_path, hls_result)) {
+            hls_output_file = hls_data_path;
+            cout << "HLS model result written to " << hls_output_file << endl;
+        } else {
+            // 退回到当前目录创建文件
+            hls_output_file = "hls_crop_data_out.txt";
+            if (!write_vector_to_file(hls_output_file, hls_result)) {
+                cerr << "Failed to write HLS result" << endl;
+                return 1;
+            }
+            cout << "HLS model result written to " << hls_output_file << " (current directory)" << endl;
         }
         cout << "HLS model completed. Output: " << hls_result.size() << " pixels" << endl;
         
