@@ -1,4 +1,4 @@
-# Install script for directory: /home/sheldon/hls_project/vibe_0726
+# Install script for directory: /home/sheldon/hls_project/vibe_crop
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -49,7 +49,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/vibe"
          RPATH "")
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/sheldon/hls_project/vibe_0726/vibe")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/sheldon/hls_project/vibe_crop/vibe")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/vibe" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/vibe")
     if(CMAKE_INSTALL_DO_STRIP)
@@ -59,17 +59,17 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  include("/home/sheldon/hls_project/vibe_0726/CMakeFiles/vibe.dir/install-cxx-module-bmi-noconfig.cmake" OPTIONAL)
+  include("/home/sheldon/hls_project/vibe_crop/CMakeFiles/vibe.dir/install-cxx-module-bmi-noconfig.cmake" OPTIONAL)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vibe" TYPE FILE FILES "/home/sheldon/hls_project/vibe_0726/data/vibe.json")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/vibe" TYPE FILE FILES "/home/sheldon/hls_project/vibe_crop/data/vibe.json")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/sheldon/hls_project/vibe_0726/install_local_manifest.txt"
+  file(WRITE "/home/sheldon/hls_project/vibe_crop/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -85,6 +85,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/sheldon/hls_project/vibe_0726/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/home/sheldon/hls_project/vibe_crop/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

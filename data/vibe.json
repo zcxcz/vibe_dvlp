@@ -1,21 +1,25 @@
 {
   "image_info": {
-    "image_path": "./data/image.txt",
+    "image_path": "data/image.txt",
     "image_format": "BAYER",
     "image_data_bitwidth": 10,
     "generate_random_image": 0,
-    "random_image_path": "./data/random_image.txt"
+    "random_image_path": "data/random_image.txt"
   },
   "register_info": {
     "reg_image_width": {
       "reg_bit_width": 16,
-      "reg_initial_value": 2,
+      "reg_initial_value": [
+        2
+      ],
       "reg_value_min": 0,
       "reg_value_max": 31
     },
     "reg_image_height": {
       "reg_bit_width": 16,
-      "reg_initial_value": 4,
+      "reg_initial_value": [
+        4
+      ],
       "reg_value_min": 0,
       "reg_value_max": 31
     },
@@ -54,7 +58,7 @@
     "reg_crop_end_x": {
       "reg_bit_width": 16,
       "reg_initial_value": [
-        1
+        0
       ],
       "reg_value_min": 0,
       "reg_value_max": 31
@@ -62,7 +66,7 @@
     "reg_crop_end_y": {
       "reg_bit_width": 16,
       "reg_initial_value": [
-        1
+        0
       ],
       "reg_value_min": 0,
       "reg_value_max": 31
@@ -70,7 +74,7 @@
     "reg_crop_enable": {
       "reg_bit_width": 1,
       "reg_initial_value": [
-        1
+        0
       ],
       "reg_value_min": 0,
       "reg_value_max": 1

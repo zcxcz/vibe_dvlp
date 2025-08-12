@@ -1,0 +1,1508 @@
+{
+  "test_count": 100,
+  "seed": 1755013530,
+  "passed": 100,
+  "failed": 0,
+  "results": [
+    {
+      "test_id": 1,
+      "config": {
+        "image_width": 2,
+        "image_height": 8,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 5,
+        "crop_end_x": 0,
+        "crop_end_y": 7
+      },
+      "expected": 3,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 3 pixels"
+    },
+    {
+      "test_id": 2,
+      "config": {
+        "image_width": 6,
+        "image_height": 2,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 12,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 12 pixels"
+    },
+    {
+      "test_id": 3,
+      "config": {
+        "image_width": 2,
+        "image_height": 3,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 6,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 6 pixels"
+    },
+    {
+      "test_id": 4,
+      "config": {
+        "image_width": 7,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 56,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 56 pixels"
+    },
+    {
+      "test_id": 5,
+      "config": {
+        "image_width": 2,
+        "image_height": 2,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 0,
+        "crop_end_x": 1,
+        "crop_end_y": 0
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 6,
+      "config": {
+        "image_width": 6,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 24,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 24 pixels"
+    },
+    {
+      "test_id": 7,
+      "config": {
+        "image_width": 1,
+        "image_height": 2,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 8,
+      "config": {
+        "image_width": 7,
+        "image_height": 7,
+        "crop_enable": 1,
+        "crop_start_x": 6,
+        "crop_start_y": 2,
+        "crop_end_x": 6,
+        "crop_end_y": 6
+      },
+      "expected": 5,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 5 pixels"
+    },
+    {
+      "test_id": 9,
+      "config": {
+        "image_width": 7,
+        "image_height": 6,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 42,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 42 pixels"
+    },
+    {
+      "test_id": 10,
+      "config": {
+        "image_width": 1,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 8,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 8 pixels"
+    },
+    {
+      "test_id": 11,
+      "config": {
+        "image_width": 2,
+        "image_height": 3,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 6,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 6 pixels"
+    },
+    {
+      "test_id": 12,
+      "config": {
+        "image_width": 3,
+        "image_height": 5,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 1,
+        "crop_end_x": 1,
+        "crop_end_y": 4
+      },
+      "expected": 8,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 8 pixels"
+    },
+    {
+      "test_id": 13,
+      "config": {
+        "image_width": 4,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 28,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 28 pixels"
+    },
+    {
+      "test_id": 14,
+      "config": {
+        "image_width": 1,
+        "image_height": 6,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 6,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 6 pixels"
+    },
+    {
+      "test_id": 15,
+      "config": {
+        "image_width": 2,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 3,
+        "crop_end_x": 1,
+        "crop_end_y": 4
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 16,
+      "config": {
+        "image_width": 7,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 4,
+        "crop_end_x": 2,
+        "crop_end_y": 5
+      },
+      "expected": 4,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 4 pixels"
+    },
+    {
+      "test_id": 17,
+      "config": {
+        "image_width": 2,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 16,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 16 pixels"
+    },
+    {
+      "test_id": 18,
+      "config": {
+        "image_width": 2,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 3,
+        "crop_end_x": 1,
+        "crop_end_y": 5
+      },
+      "expected": 3,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 3 pixels"
+    },
+    {
+      "test_id": 19,
+      "config": {
+        "image_width": 3,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 12,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 12 pixels"
+    },
+    {
+      "test_id": 20,
+      "config": {
+        "image_width": 5,
+        "image_height": 1,
+        "crop_enable": 1,
+        "crop_start_x": 4,
+        "crop_start_y": 0,
+        "crop_end_x": 4,
+        "crop_end_y": 0
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 21,
+      "config": {
+        "image_width": 7,
+        "image_height": 1,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 7,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 7 pixels"
+    },
+    {
+      "test_id": 22,
+      "config": {
+        "image_width": 3,
+        "image_height": 5,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 2,
+        "crop_end_x": 2,
+        "crop_end_y": 4
+      },
+      "expected": 6,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 6 pixels"
+    },
+    {
+      "test_id": 23,
+      "config": {
+        "image_width": 5,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 35,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 35 pixels"
+    },
+    {
+      "test_id": 24,
+      "config": {
+        "image_width": 4,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 16,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 16 pixels"
+    },
+    {
+      "test_id": 25,
+      "config": {
+        "image_width": 8,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 4,
+        "crop_end_x": 4,
+        "crop_end_y": 5
+      },
+      "expected": 6,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 6 pixels"
+    },
+    {
+      "test_id": 26,
+      "config": {
+        "image_width": 4,
+        "image_height": 5,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 20,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 20 pixels"
+    },
+    {
+      "test_id": 27,
+      "config": {
+        "image_width": 5,
+        "image_height": 3,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 15,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 15 pixels"
+    },
+    {
+      "test_id": 28,
+      "config": {
+        "image_width": 4,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 1,
+        "crop_end_x": 3,
+        "crop_end_y": 5
+      },
+      "expected": 15,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 15 pixels"
+    },
+    {
+      "test_id": 29,
+      "config": {
+        "image_width": 7,
+        "image_height": 2,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 14,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 14 pixels"
+    },
+    {
+      "test_id": 30,
+      "config": {
+        "image_width": 2,
+        "image_height": 7,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 2,
+        "crop_end_x": 1,
+        "crop_end_y": 6
+      },
+      "expected": 10,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 10 pixels"
+    },
+    {
+      "test_id": 31,
+      "config": {
+        "image_width": 6,
+        "image_height": 1,
+        "crop_enable": 1,
+        "crop_start_x": 3,
+        "crop_start_y": 0,
+        "crop_end_x": 5,
+        "crop_end_y": 0
+      },
+      "expected": 3,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 3 pixels"
+    },
+    {
+      "test_id": 32,
+      "config": {
+        "image_width": 6,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 42,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 42 pixels"
+    },
+    {
+      "test_id": 33,
+      "config": {
+        "image_width": 8,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 32,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 32 pixels"
+    },
+    {
+      "test_id": 34,
+      "config": {
+        "image_width": 7,
+        "image_height": 5,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 35,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 35 pixels"
+    },
+    {
+      "test_id": 35,
+      "config": {
+        "image_width": 7,
+        "image_height": 1,
+        "crop_enable": 1,
+        "crop_start_x": 5,
+        "crop_start_y": 0,
+        "crop_end_x": 6,
+        "crop_end_y": 0
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 36,
+      "config": {
+        "image_width": 2,
+        "image_height": 3,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 6,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 6 pixels"
+    },
+    {
+      "test_id": 37,
+      "config": {
+        "image_width": 6,
+        "image_height": 7,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 1,
+        "crop_end_x": 2,
+        "crop_end_y": 6
+      },
+      "expected": 18,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 18 pixels"
+    },
+    {
+      "test_id": 38,
+      "config": {
+        "image_width": 6,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 24,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 24 pixels"
+    },
+    {
+      "test_id": 39,
+      "config": {
+        "image_width": 1,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 1,
+        "crop_end_x": 0,
+        "crop_end_y": 1
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 40,
+      "config": {
+        "image_width": 2,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 14,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 14 pixels"
+    },
+    {
+      "test_id": 41,
+      "config": {
+        "image_width": 7,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 28,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 28 pixels"
+    },
+    {
+      "test_id": 42,
+      "config": {
+        "image_width": 3,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 24,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 24 pixels"
+    },
+    {
+      "test_id": 43,
+      "config": {
+        "image_width": 6,
+        "image_height": 7,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 0,
+        "crop_end_x": 4,
+        "crop_end_y": 6
+      },
+      "expected": 28,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 28 pixels"
+    },
+    {
+      "test_id": 44,
+      "config": {
+        "image_width": 1,
+        "image_height": 1,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 45,
+      "config": {
+        "image_width": 2,
+        "image_height": 8,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 5,
+        "crop_end_x": 1,
+        "crop_end_y": 7
+      },
+      "expected": 3,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 3 pixels"
+    },
+    {
+      "test_id": 46,
+      "config": {
+        "image_width": 8,
+        "image_height": 1,
+        "crop_enable": 1,
+        "crop_start_x": 5,
+        "crop_start_y": 0,
+        "crop_end_x": 6,
+        "crop_end_y": 0
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 47,
+      "config": {
+        "image_width": 2,
+        "image_height": 5,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 10,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 10 pixels"
+    },
+    {
+      "test_id": 48,
+      "config": {
+        "image_width": 7,
+        "image_height": 8,
+        "crop_enable": 1,
+        "crop_start_x": 5,
+        "crop_start_y": 6,
+        "crop_end_x": 6,
+        "crop_end_y": 6
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 49,
+      "config": {
+        "image_width": 6,
+        "image_height": 3,
+        "crop_enable": 1,
+        "crop_start_x": 4,
+        "crop_start_y": 1,
+        "crop_end_x": 4,
+        "crop_end_y": 2
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 50,
+      "config": {
+        "image_width": 8,
+        "image_height": 8,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 4,
+        "crop_end_x": 5,
+        "crop_end_y": 5
+      },
+      "expected": 8,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 8 pixels"
+    },
+    {
+      "test_id": 51,
+      "config": {
+        "image_width": 8,
+        "image_height": 4,
+        "crop_enable": 1,
+        "crop_start_x": 5,
+        "crop_start_y": 3,
+        "crop_end_x": 5,
+        "crop_end_y": 3
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 52,
+      "config": {
+        "image_width": 7,
+        "image_height": 3,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 2,
+        "crop_end_x": 3,
+        "crop_end_y": 2
+      },
+      "expected": 4,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 4 pixels"
+    },
+    {
+      "test_id": 53,
+      "config": {
+        "image_width": 7,
+        "image_height": 6,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 42,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 42 pixels"
+    },
+    {
+      "test_id": 54,
+      "config": {
+        "image_width": 1,
+        "image_height": 1,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 55,
+      "config": {
+        "image_width": 8,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 32,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 32 pixels"
+    },
+    {
+      "test_id": 56,
+      "config": {
+        "image_width": 5,
+        "image_height": 4,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 20,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 20 pixels"
+    },
+    {
+      "test_id": 57,
+      "config": {
+        "image_width": 7,
+        "image_height": 2,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 14,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 14 pixels"
+    },
+    {
+      "test_id": 58,
+      "config": {
+        "image_width": 2,
+        "image_height": 5,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 2,
+        "crop_end_x": 1,
+        "crop_end_y": 4
+      },
+      "expected": 3,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 3 pixels"
+    },
+    {
+      "test_id": 59,
+      "config": {
+        "image_width": 3,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 21,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 21 pixels"
+    },
+    {
+      "test_id": 60,
+      "config": {
+        "image_width": 5,
+        "image_height": 1,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 5,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 5 pixels"
+    },
+    {
+      "test_id": 61,
+      "config": {
+        "image_width": 8,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 64,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 64 pixels"
+    },
+    {
+      "test_id": 62,
+      "config": {
+        "image_width": 6,
+        "image_height": 1,
+        "crop_enable": 1,
+        "crop_start_x": 4,
+        "crop_start_y": 0,
+        "crop_end_x": 4,
+        "crop_end_y": 0
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 63,
+      "config": {
+        "image_width": 1,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 7,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 7 pixels"
+    },
+    {
+      "test_id": 64,
+      "config": {
+        "image_width": 6,
+        "image_height": 2,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 0,
+        "crop_end_x": 5,
+        "crop_end_y": 0
+      },
+      "expected": 5,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 5 pixels"
+    },
+    {
+      "test_id": 65,
+      "config": {
+        "image_width": 8,
+        "image_height": 5,
+        "crop_enable": 1,
+        "crop_start_x": 7,
+        "crop_start_y": 4,
+        "crop_end_x": 7,
+        "crop_end_y": 4
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 66,
+      "config": {
+        "image_width": 2,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 5,
+        "crop_end_x": 1,
+        "crop_end_y": 5
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 67,
+      "config": {
+        "image_width": 2,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 3,
+        "crop_end_x": 1,
+        "crop_end_y": 3
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 68,
+      "config": {
+        "image_width": 6,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 48,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 48 pixels"
+    },
+    {
+      "test_id": 69,
+      "config": {
+        "image_width": 6,
+        "image_height": 4,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 0,
+        "crop_end_x": 4,
+        "crop_end_y": 2
+      },
+      "expected": 9,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 9 pixels"
+    },
+    {
+      "test_id": 70,
+      "config": {
+        "image_width": 5,
+        "image_height": 3,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 15,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 15 pixels"
+    },
+    {
+      "test_id": 71,
+      "config": {
+        "image_width": 6,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 4,
+        "crop_end_x": 3,
+        "crop_end_y": 5
+      },
+      "expected": 4,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 4 pixels"
+    },
+    {
+      "test_id": 72,
+      "config": {
+        "image_width": 1,
+        "image_height": 2,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 1,
+        "crop_end_x": 0,
+        "crop_end_y": 1
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 73,
+      "config": {
+        "image_width": 1,
+        "image_height": 6,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 6,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 6 pixels"
+    },
+    {
+      "test_id": 74,
+      "config": {
+        "image_width": 3,
+        "image_height": 4,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 1,
+        "crop_end_x": 2,
+        "crop_end_y": 3
+      },
+      "expected": 9,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 9 pixels"
+    },
+    {
+      "test_id": 75,
+      "config": {
+        "image_width": 2,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 16,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 16 pixels"
+    },
+    {
+      "test_id": 76,
+      "config": {
+        "image_width": 6,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 48,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 48 pixels"
+    },
+    {
+      "test_id": 77,
+      "config": {
+        "image_width": 8,
+        "image_height": 5,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 3,
+        "crop_end_x": 7,
+        "crop_end_y": 4
+      },
+      "expected": 12,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 12 pixels"
+    },
+    {
+      "test_id": 78,
+      "config": {
+        "image_width": 5,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 35,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 35 pixels"
+    },
+    {
+      "test_id": 79,
+      "config": {
+        "image_width": 8,
+        "image_height": 3,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 2,
+        "crop_end_x": 4,
+        "crop_end_y": 2
+      },
+      "expected": 5,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 5 pixels"
+    },
+    {
+      "test_id": 80,
+      "config": {
+        "image_width": 8,
+        "image_height": 1,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 8,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 8 pixels"
+    },
+    {
+      "test_id": 81,
+      "config": {
+        "image_width": 2,
+        "image_height": 8,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 3,
+        "crop_end_x": 0,
+        "crop_end_y": 5
+      },
+      "expected": 3,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 3 pixels"
+    },
+    {
+      "test_id": 82,
+      "config": {
+        "image_width": 4,
+        "image_height": 4,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 1,
+        "crop_end_x": 0,
+        "crop_end_y": 1
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 83,
+      "config": {
+        "image_width": 8,
+        "image_height": 3,
+        "crop_enable": 1,
+        "crop_start_x": 5,
+        "crop_start_y": 0,
+        "crop_end_x": 5,
+        "crop_end_y": 0
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 84,
+      "config": {
+        "image_width": 5,
+        "image_height": 7,
+        "crop_enable": 1,
+        "crop_start_x": 1,
+        "crop_start_y": 5,
+        "crop_end_x": 3,
+        "crop_end_y": 5
+      },
+      "expected": 3,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 3 pixels"
+    },
+    {
+      "test_id": 85,
+      "config": {
+        "image_width": 3,
+        "image_height": 5,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 15,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 15 pixels"
+    },
+    {
+      "test_id": 86,
+      "config": {
+        "image_width": 5,
+        "image_height": 6,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 30,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 30 pixels"
+    },
+    {
+      "test_id": 87,
+      "config": {
+        "image_width": 4,
+        "image_height": 8,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 3,
+        "crop_end_x": 3,
+        "crop_end_y": 6
+      },
+      "expected": 8,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 8 pixels"
+    },
+    {
+      "test_id": 88,
+      "config": {
+        "image_width": 2,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 16,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 16 pixels"
+    },
+    {
+      "test_id": 89,
+      "config": {
+        "image_width": 1,
+        "image_height": 5,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 4,
+        "crop_end_x": 0,
+        "crop_end_y": 4
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 90,
+      "config": {
+        "image_width": 2,
+        "image_height": 6,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 12,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 12 pixels"
+    },
+    {
+      "test_id": 91,
+      "config": {
+        "image_width": 1,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 8,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 8 pixels"
+    },
+    {
+      "test_id": 92,
+      "config": {
+        "image_width": 2,
+        "image_height": 7,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 6,
+        "crop_end_x": 0,
+        "crop_end_y": 6
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 93,
+      "config": {
+        "image_width": 5,
+        "image_height": 7,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 35,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 35 pixels"
+    },
+    {
+      "test_id": 94,
+      "config": {
+        "image_width": 1,
+        "image_height": 2,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 95,
+      "config": {
+        "image_width": 2,
+        "image_height": 7,
+        "crop_enable": 1,
+        "crop_start_x": 0,
+        "crop_start_y": 1,
+        "crop_end_x": 0,
+        "crop_end_y": 1
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 96,
+      "config": {
+        "image_width": 7,
+        "image_height": 6,
+        "crop_enable": 1,
+        "crop_start_x": 3,
+        "crop_start_y": 5,
+        "crop_end_x": 4,
+        "crop_end_y": 5
+      },
+      "expected": 2,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 2 pixels"
+    },
+    {
+      "test_id": 97,
+      "config": {
+        "image_width": 6,
+        "image_height": 6,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 36,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 36 pixels"
+    },
+    {
+      "test_id": 98,
+      "config": {
+        "image_width": 8,
+        "image_height": 2,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 1,
+        "crop_end_x": 2,
+        "crop_end_y": 1
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 99,
+      "config": {
+        "image_width": 3,
+        "image_height": 2,
+        "crop_enable": 1,
+        "crop_start_x": 2,
+        "crop_start_y": 1,
+        "crop_end_x": 2,
+        "crop_end_y": 1
+      },
+      "expected": 1,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 1 pixels"
+    },
+    {
+      "test_id": 100,
+      "config": {
+        "image_width": 4,
+        "image_height": 8,
+        "crop_enable": 0,
+        "crop_start_x": 0,
+        "crop_start_y": 0,
+        "crop_end_x": 0,
+        "crop_end_y": 0
+      },
+      "expected": 32,
+      "success": true,
+      "message": "\u8f93\u51fa\u6b63\u786e: 32 pixels"
+    }
+  ]
+}
