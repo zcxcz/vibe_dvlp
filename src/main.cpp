@@ -65,11 +65,11 @@ bool compare_vectors(const vector<uint16_t>& vec1, const vector<uint16_t>& vec2)
 void vector_to_stream(const vector<uint16_t>& data, hls::stream<axis_pixel_t>& stream) {
     for (size_t i = 0; i < data.size(); ++i) {
         axis_pixel_t data_pkt;
-        if (data[i] >= 1024) {
-            std::cerr << "Warning: Value " << data[i] << " exceeds 10-bit range, truncating" << std::endl;
-            data_pkt.data = 1023; // 10-bit max
+        if (data[i] >= 256) {
+            std::cerr << "Warning: Value " << data[i] << " exceeds 8-bit range, truncating" << std::endl;
+            data_pkt.data = 255; // 8-bit max
         } else {
-            data_pkt.data = static_cast<pixel_t>(data[i]);
+            data_pkt.data = static_cast<ap_uint<8>>(data[i]);
         }
         data_pkt.last = (i == data.size() - 1) ? 1 : 0;
         stream.write(data_pkt);
@@ -178,17 +178,25 @@ private:
 int main(const int argc, const char *argv[]) {
     try {
         // 读取JSON配置 - 兼容不同构建目录
-        string config_path = "./vibe.json";
-        ifstream f(config_path);
-        if (!f.is_open()) {
-            // 尝试工作目录路径
-            config_path = "./data/vibe.json";
-            f.open(config_path);
-        }
-        if (!f.is_open()) {
-            cerr << "Error: Cannot open vibe.json configuration file" << endl;
-            return 1;
-        }
+    string config_path = "./vibe.json";
+    ifstream f(config_path);
+    if (!f.is_open()) {
+        // 尝试data子目录路径
+        config_path = "./data/vibe.json";
+        f.open(config_path);
+    }
+    if (!f.is_open()) {
+        // 尝试上级目录的data子目录路径
+        config_path = "../data/vibe.json";
+        f.open(config_path);
+    }
+    if (!f.is_open()) {
+        cerr << "Error: Cannot open vibe.json configuration file" << endl;
+        return 1;
+    }
+
+    cout << "vibe.json configuration file path: " << config_path << endl;
+    
         json data = json::parse(f);
         
         ImageInfo img_info = data["image_info"].get<ImageInfo>();
@@ -201,42 +209,76 @@ int main(const int argc, const char *argv[]) {
         reg_info.print_values();
         
         vector<uint16_t> input_image;
-        string image_path = img_info.image_path;
-        
+
         // 生成或读取输入图像 - 多路径兼容处理
         if (img_info.generate_random_image == 1) {
             cout << "Generating random image using algorithm model..." << endl;
-            input_image = AlgCrop::generate_random_image(width, height, 1023);
-            image_path = img_info.random_image_path;
+            input_image = AlgCrop::generate_random_image(width, height, 255);
             
-            if (!AlgCrop::write_image_to_file(image_path, input_image)) {
-                cerr << "Failed to save random image" << endl;
-                return 1;
-            }
-            cout << "Random image generated: " << image_path << endl;
-        } else {
-            // 多路径尝试加载图像文件
-            vector<string> image_paths = {
-                image_path,
-                "image.txt",
-                "data/image.txt",
-                "../data/image.txt",
-                "./data/image.txt"
+            // 保存生成的随机图像到文件
+            vector<string> save_paths = {
+                // "../data/" + img_info.random_image_path,
+                "./data/" + img_info.random_image_path,
+                "./" + img_info.random_image_path
             };
             
-            bool loaded = false;
-            for (const auto& path : image_paths) {
-                cout << "Trying to load image: " << path << endl;
-                input_image = read_data_to_vector(path);
-                if (!input_image.empty()) {
-                    cout << "Successfully loaded image: " << path << endl;
-                    loaded = true;
+            bool image_saved = false;
+            for (const auto& path : save_paths) {
+                cout << "Trying to save random image: " << path << endl;
+                if (AlgCrop::write_image_to_file(path, input_image)) {
+                    cout << "Successfully saved random image: " << path << endl;
+                    image_saved = true;
                     break;
                 }
             }
             
-            if (!loaded) {
-                cerr << "Failed to load image from any path" << endl;
+            if (!image_saved) {
+                cerr << "Failed to save random image to any path" << endl;
+                return 1;
+            }
+            
+            // 从文件中加载随机图像
+            vector<string> image_paths = {
+                // "../data/"+img_info.random_image_path,
+                "./data/"+img_info.random_image_path,
+                "./"+img_info.random_image_path
+            };
+            bool image_load = false;
+            for (const auto& path : image_paths) {
+                cout << "Trying to load random image: " << path << endl;
+                input_image = read_data_to_vector(path);
+                if (!input_image.empty()) {
+                    cout << "Successfully load image: " << path << endl;
+                    image_load = true;
+                    break;
+                }
+            }
+            
+            if (!image_load) {
+                cerr << "Failed to load random image from any path" << endl;
+                return 1;
+            }
+        } else {
+            // 多路径尝试加载图像文件
+            vector<string> image_paths = {
+                "../data/" + img_info.image_path,
+                "./data/" + img_info.image_path,
+                "./" + img_info.image_path
+            };
+            
+            bool image_load = false;
+            for (const auto& path : image_paths) {
+                cout << "Trying to load image: " << path << endl;
+                input_image = read_data_to_vector(path);
+                if (!input_image.empty()) {
+                    cout << "Successfully load image: " << path << endl;
+                    image_load = true;
+                    break;
+                }
+            }
+            
+            if (!image_load) {
+                cerr << "Failed to load input image from any path" << endl;
                 return 1;
             }
         }
@@ -254,20 +296,26 @@ int main(const int argc, const char *argv[]) {
         
         // 将算法模型的结果写入文件 - 优先尝试data子文件夹，不存在则当前目录
         string alg_output_file;
-        string data_path = "data/alg_crop_data_out.txt";
-        
+        string data_path = "./data/alg_crop_data_out.txt";
+        vector<string> data_paths = {
+            // "../data/"+img_info.random_image_path,
+            "./data/alg_crop_data_out.txt",
+            "./alg_crop_data_out.txt",
+        };
+        bool alg_data_store = false;
+        for (const auto& path : data_paths) {
         // 尝试创建data子文件夹下的文件
-        if (AlgCrop::write_image_to_file(data_path, alg_result)) {
-            alg_output_file = data_path;
-            cout << "Algorithm model result written to " << alg_output_file << endl;
-        } else {
-            // 退回到当前目录创建文件
-            alg_output_file = "alg_crop_data_out.txt";
-            if (!AlgCrop::write_image_to_file(alg_output_file, alg_result)) {
-                cerr << "Failed to write algorithm result" << endl;
-                return 1;
+            if (AlgCrop::write_image_to_file(path, alg_result)) {
+                alg_output_file = path;
+                cout << "Algorithm model result written to " << alg_output_file << endl;
+                alg_data_store = true;
+                break;
             }
-            cout << "Algorithm model result written to " << alg_output_file << " (current directory)" << endl;
+        }
+        
+        if (alg_data_store == false) {
+            cerr << "Failed to store algorithm result to data folder" << endl;
+            return 1;
         }
         cout << "Algorithm model completed. Output: " << alg_result.size() << " pixels" << endl;
         
@@ -299,20 +347,19 @@ int main(const int argc, const char *argv[]) {
         
         // 将HLS模型的结果写入文件 - 优先尝试data子文件夹，不存在则当前目录
         string hls_output_file;
-        string hls_data_path = "data/hls_crop_data_out.txt";
-        
+        string hls_data_path = "./data/hls_crop_data_out.txt";
+        vector<string> hls_data_paths = {
+            "./data/hls_crop_data_out.txt",
+            "./hls_crop_data_out.txt",
+        };
+        bool hls_data_store = false;
         // 尝试创建data子文件夹下的文件
-        if (write_vector_to_file(hls_data_path, hls_result)) {
-            hls_output_file = hls_data_path;
-            cout << "HLS model result written to " << hls_output_file << endl;
-        } else {
-            // 退回到当前目录创建文件
-            hls_output_file = "hls_crop_data_out.txt";
-            if (!write_vector_to_file(hls_output_file, hls_result)) {
-                cerr << "Failed to write HLS result" << endl;
-                return 1;
+        for (const auto& path : hls_data_paths) {
+            if (write_vector_to_file(path, hls_result)) {
+                hls_output_file = path;
+                cout << "HLS model result written to " << hls_output_file << endl;
+                break;
             }
-            cout << "HLS model result written to " << hls_output_file << " (current directory)" << endl;
         }
         cout << "HLS model completed. Output: " << hls_result.size() << " pixels" << endl;
         

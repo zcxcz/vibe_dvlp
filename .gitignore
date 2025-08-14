@@ -2,3 +2,4 @@
 /CMakeFiles
 /src/hls_lib
 *.img
+/.*

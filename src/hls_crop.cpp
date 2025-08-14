@@ -11,8 +11,10 @@ void crop_hls(
     #pragma HLS INTERFACE s_axilite port=regs bundle=control
     #pragma HLS INTERFACE s_axilite port=return bundle=control
     
-    ap_uint<32> total_pixels = regs.image_height * regs.image_width;
-    
+
+    RegisterHlsInfo dummy = regs;
+
+
     if (!regs.crop_enable) {
         // 如果crop未启用，直接透传所有数据（包括last信号）
         // 使用两层for循环实现数据透传，与裁剪模式结构一致
@@ -56,26 +58,18 @@ void crop_hls(
             
             if (in_crop_region) {
                 output_count++;
-                
-                // 在裁剪模式下，last信号处理策略：
-                // 1. 如果检测到输入last信号，强制设置输出last
-                // 2. 如果达到预期输出数量，设置last信号
-                bool should_set_last = (output_count == expected_output) || frame_end;
-                
-                data_pkt.last = should_set_last ? 1 : 0;
-                
-                output_stream.write(data_pkt);
-                
-                // 如果已经到达帧尾且还有剩余数据，需要处理边界情况
-                if (frame_end && output_count < expected_output) {
-                    // 这种情况表示配置与输入数据不符，但已设置last信号
-                    // DMA会根据last信号结束传输
-                }
             }
             
-            // 如果到达帧尾但还有输入数据，继续处理直到帧结束
-            if (frame_end && !in_crop_region) {
-                // 消费剩余数据但不输出
+            bool crop_count_end = (output_count == expected_output);
+            
+            if (crop_count_end) {
+                data_pkt.last = 1;
+            } else {
+                data_pkt.last = 0;
+            }
+
+            if (in_crop_region) {
+                output_stream.write(data_pkt);
             }
         }
     }

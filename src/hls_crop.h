@@ -3,15 +3,11 @@
 
 #include <ap_int.h>
 #include <hls_stream.h>
-
-// 定义数据类型为10-bit
-const int DATA_WIDTH = 10;
-typedef ap_uint<DATA_WIDTH> pixel_t;
-
 #include "ap_axi_sdata.h"
 
-// 使用标准的AXI Stream数据类型，兼容模板工程
-typedef ap_axiu<10, 0, 0, 0> axis_pixel_t;
+// 定义数据类型为10-bit
+const int DATA_WIDTH = 8;
+typedef ap_axiu<DATA_WIDTH, 0, 0, 0> axis_pixel_t;
 
 // HLS寄存器信息结构体
 struct RegisterHlsInfo {

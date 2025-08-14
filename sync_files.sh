@@ -63,12 +63,20 @@ fi
 
 # 同步.json配置文件
 echo "正在同步.json配置文件..."
-JSON_FILES=$(find "$SOURCE_DIR" -maxdepth 1 -name "*.json" 2>/dev/null)
-if [ -n "$JSON_FILES" ]; then
+# JSON_FILES=$(find "$SOURCE_DIR" -maxdepth 1 -name "*.json" 2>/dev/null)
+if [ -d "$SOURCE_DIR/data" ]; then
     cp "$SOURCE_DIR"/data/*.json "$TARGET_DIR/data/" 2>/dev/null
     if [ $? -eq 0 ]; then
         echo "✓ 成功同步.json文件到 $TARGET_DIR/data/"
         ls -la "$TARGET_DIR"/data/*.json 2>/dev/null || echo "  注意：未找到.json文件"
+    else
+        echo "⚠ 警告：同步.json文件时出现问题"
+        exit 1
+    fi
+    cp "$SOURCE_DIR"/data/*.json "$TARGET_DIR/hls/solution1/csim/build/" 2>/dev/null
+    if [ $? -eq 0 ]; then
+        echo "✓ 成功同步.json文件到 $TARGET_DIR/hls/solution1/csim/build/"
+        ls -la "$TARGET_DIR"/hls/solution1/csim/build/*.json 2>/dev/null || echo "  注意：未找到.json文件"
     else
         echo "⚠ 警告：同步.json文件时出现问题"
         exit 1
