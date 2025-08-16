@@ -1,5 +1,5 @@
 /build
 /CMakeFiles
 /src/hls_lib
-*.img
+*.txt
 /.*
