@@ -1,5 +1,7 @@
 /build
 /CMakeFiles
 /src/hls_lib
+*InfiniteISP/
+*openISP/
 *.txt
 /.*
