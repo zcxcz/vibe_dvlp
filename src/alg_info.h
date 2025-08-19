@@ -39,10 +39,11 @@ struct AlgCommonRegisterInfo {
     
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(AlgCommonRegisterInfo, reg_image_width, reg_image_height)
     
-    void print_values() const;
+    void print_info() const;
     
 private:
-    void print_reg_info(const string& name, const RegInfo& reg) const;
+    void print_reg(const string& name, const RegInfo& reg) const;
+    void print_reg_value(const string& name, const RegInfo& reg) const;
 };
 
 struct AlgCropRegisterInfo {

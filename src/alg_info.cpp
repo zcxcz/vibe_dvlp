@@ -44,14 +44,14 @@ void AlgCommonRegisterInfo::print_info() const {
 }
 
 void AlgCommonRegisterInfo::print_reg(const string& name, const RegInfo& reg) const {
-    print_reg_value(name);
+    print_reg_value(name, reg);
     cout << "  Bit Width: " << reg.reg_bit_width << endl;
     cout << "  Min Value: " << reg.reg_value_min << endl;
     cout << "  Max Value: " << reg.reg_value_max << endl;
     reg.print_values("  Initial Value");
 }
 
-void RegInfo::print_reg_value(const string& name, const RegInfo& reg) const {
+void AlgCommonRegisterInfo::print_reg_value(const string& name, const RegInfo& reg) const {
     cout << name << ": ";
     if(reg.reg_initial_value.empty()) {
         cout << "0";
