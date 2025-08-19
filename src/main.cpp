@@ -1,5 +1,7 @@
 #include "json.hpp"
+#include "alg_info.h"
 #include "alg_crop.h"
+#include "alg_dpc.h"
 #include "hls_crop.h"
 #include <iostream>
 #include <fstream>
@@ -86,135 +88,6 @@ vector<uint16_t> stream_to_vector(hls::stream<axis_pixel_t>& stream) {
     return data;
 }
 
-// 复用原来的JSON结构定义
-struct ImageInfo {
-    string image_path;
-    string image_format;
-    int image_data_bitwidth;
-    int generate_random_image;
-    string random_image_path;
-    
-    void print_values() const {
-        cout << "=== Image Information ===" << endl;
-        cout << "Image Path: " << image_path << endl;
-        cout << "Image Format: " << image_format << endl;
-        cout << "Image Data Bitwidth: " << image_data_bitwidth << endl;
-        cout << "Generate Random Image: " << (generate_random_image ? "Yes" : "No") << endl;
-        cout << "Random Image Path: " << random_image_path << endl;
-        cout << "========================" << endl;
-    }
-    
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ImageInfo, image_path, image_format, image_data_bitwidth, generate_random_image, random_image_path)
-};
-
-struct RegInfo {
-    int reg_bit_width;
-    vector<int> reg_initial_value;
-    int reg_value_min;
-    int reg_value_max;
-    
-    int operator[](size_t index) const {
-        return index < reg_initial_value.size() ? reg_initial_value[index] : 0;
-    }
-    
-    size_t size() const {
-        return reg_initial_value.empty() ? 1 : reg_initial_value.size();
-    }
-    
-    void print_values(const string& name = "Values") const {
-        cout << name << ": ";
-        if (reg_initial_value.empty()) {
-            cout << "0";
-        } else if (reg_initial_value.size() == 1) {
-            cout << reg_initial_value[0];
-        } else {
-            for (size_t i = 0; i < reg_initial_value.size(); ++i) {
-                cout << reg_initial_value[i];
-                if (i < reg_initial_value.size() - 1) cout << " ";
-            }
-        }
-        cout << endl;
-    }
-    
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RegInfo, reg_bit_width, reg_initial_value, reg_value_min, reg_value_max)
-};
-
-struct RegisterInfo {
-    RegInfo reg_image_width;
-    RegInfo reg_image_height;
-    RegInfo reg_filter_coeff;
-    RegInfo reg_crop_start_x;
-    RegInfo reg_crop_start_y;
-    RegInfo reg_crop_end_x;
-    RegInfo reg_crop_end_y;
-    RegInfo reg_crop_enable;
-    
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RegisterInfo, reg_image_width, reg_image_height, reg_filter_coeff, 
-                                   reg_crop_start_x, reg_crop_start_y, reg_crop_end_x, reg_crop_end_y, reg_crop_enable)
-    
-    void print_values() const {
-        cout << "=== Register Information ===" << endl;
-        print_reg_info("Reg Image Width", reg_image_width);
-        print_reg_info("Reg Image Height", reg_image_height);
-        print_reg_info("Reg Filter Coeff", reg_filter_coeff);
-        print_reg_info("Reg Crop Start X", reg_crop_start_x);
-        print_reg_info("Reg Crop Start Y", reg_crop_start_y);
-        print_reg_info("Reg Crop End X", reg_crop_end_x);
-        print_reg_info("Reg Crop End Y", reg_crop_end_y);
-        print_reg_info("Reg Crop Enable", reg_crop_enable);
-        cout << "==========================" << endl;
-    }
-    
-private:
-    void print_reg_info(const string& name, const RegInfo& reg) const {
-        cout << name << ":" << endl;
-        cout << "  Bit Width: " << reg.reg_bit_width << endl;
-        cout << "  Min Value: " << reg.reg_value_min << endl;
-        cout << "  Max Value: " << reg.reg_value_max << endl;
-        reg.print_values("  Initial Value");
-    }
-};
-
-int main(const int argc, const char *argv[]) {
-    try {
-        // 读取JSON配置 - 兼容不同构建目录
-    string config_path = "./vibe.json";
-    ifstream f(config_path);
-    if (!f.is_open()) {
-        // 尝试data子目录路径
-        config_path = "./data/vibe.json";
-        f.open(config_path);
-    }
-    if (!f.is_open()) {
-        // 尝试上级目录的data子目录路径
-        config_path = "../data/vibe.json";
-        f.open(config_path);
-    }
-    if (!f.is_open()) {
-        cerr << "Error: Cannot open vibe.json configuration file" << endl;
-        return 1;
-    }
-
-    cout << "vibe.json configuration file path: " << config_path << endl;
-    
-        json data = json::parse(f);
-        
-        ImageInfo img_info = data["image_info"].get<ImageInfo>();
-        RegisterInfo reg_info = data["register_info"].get<RegisterInfo>();
-        
-        int width = reg_info.reg_image_width[0];
-        int height = reg_info.reg_image_height[0];
-        
-        img_info.print_values();
-        reg_info.print_values();
-        
-        vector<uint16_t> input_image;
-
-        // 生成或读取输入图像 - 多路径兼容处理
-        if (img_info.generate_random_image == 1) {
-            cout << "Generating random image using algorithm model..." << endl;
-            input_image = AlgCrop::generate_random_image(width, height, 255);
-            
             // 保存生成的随机图像到文件
             vector<string> save_paths = {
                 // "../data/" + img_info.random_image_path,
@@ -318,6 +191,40 @@ int main(const int argc, const char *argv[]) {
             return 1;
         }
         cout << "Algorithm model completed. Output: " << alg_result.size() << " pixels" << endl;
+        
+        // 算法模型DPC处理
+        cout << "Running algorithm model DPC..." << endl;
+        int crop_width = reg_info.reg_crop_end_x[0] - reg_info.reg_crop_start_x[0] + 1;
+        int crop_height = reg_info.reg_crop_end_y[0] - reg_info.reg_crop_start_y[0] + 1;
+        
+        std::vector<alg_pixel_t> dpc_result = AlgDpc::process_image(
+            alg_result, 
+            crop_width, 
+            crop_height,
+            reg_info.reg_dpc_threshold[0]
+        );
+        
+        // 将DPC算法模型的结果写入文件
+        string dpc_output_file;
+        vector<string> dpc_data_paths = {
+            "./data/alg_dpc_data_out.txt",
+            "./alg_dpc_data_out.txt",
+        };
+        bool dpc_data_store = false;
+        for (const auto& path : dpc_data_paths) {
+            if (AlgCrop::write_image_to_file(path, dpc_result)) {
+                dpc_output_file = path;
+                cout << "Algorithm DPC model result written to " << dpc_output_file << endl;
+                dpc_data_store = true;
+                break;
+            }
+        }
+        
+        if (dpc_data_store == false) {
+            cerr << "Failed to store DPC algorithm result to data folder" << endl;
+            return 1;
+        }
+        cout << "Algorithm DPC model completed. Output: " << dpc_result.size() << " pixels" << endl;
         
         // HLS模型处理
         cout << "Running HLS model crop..." << endl;

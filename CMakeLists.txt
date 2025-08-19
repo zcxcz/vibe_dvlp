@@ -18,7 +18,9 @@ endif()
 # Add executable
 add_executable(${PROJECT_NAME} 
     src/main.cpp
+    src/alg_info.cpp
     src/alg_crop.cpp
+    src/alg_dpc.cpp
     src/hls_crop.cpp
 )
 

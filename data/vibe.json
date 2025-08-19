@@ -23,7 +23,15 @@
       "reg_value_min": 0,
       "reg_value_max": 31
     },
-    "reg_filter_coeff": {
+    "reg_smooth_filter_enable": {
+      "reg_bit_width": 1,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 1
+    },
+    "reg_smooth_filter_coeff": {
       "reg_bit_width": 8,
       "reg_initial_value": [
         1,
@@ -39,6 +47,22 @@
       "reg_value_min": 0,
       "reg_value_max": 255
     },
+    "reg_dpc_enable": {
+      "reg_bit_width": 1,
+      "reg_initial_value": [
+        1
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 1
+    },
+    "reg_dpc_threshold": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+      },
     "reg_crop_start_x": {
       "reg_bit_width": 16,
       "reg_initial_value": [

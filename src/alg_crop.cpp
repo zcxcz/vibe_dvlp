@@ -1,21 +1,8 @@
 #include "alg_crop.h"
-#include <fstream>
 #include <iostream>
-#include <random>
 #include <algorithm>
-
-std::vector<alg_pixel_t> AlgCrop::generate_random_image(int width, int height, int max_value) {
-    std::vector<alg_pixel_t> image(width * height);
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<alg_pixel_t> dis(0, max_value);
-    
-    for (int i = 0; i < width * height; ++i) {
-        image[i] = dis(gen);
-    }
-    
-    return image;
-}
+#include <random>
+#include <fstream>
 
 std::vector<alg_pixel_t> AlgCrop::crop_image(
     const std::vector<alg_pixel_t>& input_image,
@@ -81,32 +68,35 @@ std::vector<alg_pixel_t> AlgCrop::crop_image(
     return cropped_image;
 }
 
-std::vector<alg_pixel_t> AlgCrop::read_image_from_file(const std::string& filename) {
-    std::ifstream file(filename);
-    std::vector<alg_pixel_t> data;
+// 生成随机图像
+std::vector<alg_pixel_t> AlgCrop::generate_random_image(int width, int height, int max_value) {
+    std::vector<alg_pixel_t> image(width * height);
     
-    if (!file.is_open()) {
-        std::cerr << "Error: Cannot open file " << filename << std::endl;
-        return data;
+    // 使用随机数生成器
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, max_value);
+    
+    // 填充随机值
+    for (int i = 0; i < width * height; ++i) {
+        image[i] = static_cast<alg_pixel_t>(dis(gen));
     }
     
-    int value;
-    while (file >> value) {
-        data.push_back(static_cast<alg_pixel_t>(value));
-    }
-    
-    return data;
+    return image;
 }
 
+// 写入图像到文件
 bool AlgCrop::write_image_to_file(const std::string& filename, const std::vector<alg_pixel_t>& data) {
-    std::ofstream file(filename);
-    if (!file.is_open()) {
+    std::ofstream output_file(filename);
+    if (!output_file) {
+        std::cerr << "Cannot open output file: " << filename << std::endl;
         return false;
     }
     
     for (const auto& value : data) {
-        file << static_cast<int>(value) << "\n";
+        output_file << static_cast<int>(value) << "\n";
     }
     
+    output_file.close();
     return true;
 }

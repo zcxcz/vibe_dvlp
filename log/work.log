@@ -1,0 +1,138 @@
+# VIBE CROP PROJECT - HLS-based ISP Module
+
+## 项目概述 (Project Overview)
+本项目旨在开发基于HLS的ISP（图像信号处理）模块，重点实现和集成'crop'（裁剪）和'dpc'（坏点校正）算法。项目结构包括用于HLS的C++源码、测试用Python脚本和Vivado HLS构建目录。
+
+## 项目架构 (Project Architecture)
+
+### 核心组件 (Core Components)
+1. **算法模块** (`src/alg_*.cpp/h`)
+   - AlgCrop: 图像裁剪算法
+   - AlgDpc: 坏点校正算法
+   - AlgoCommon: 共享工具和数据类型
+
+2. **HLS实现** (`src/hls_*.cpp/h`)
+   - 算法的HLS优化版本
+   - 硬件接口定义
+   - 流处理实现
+
+3. **寄存器管理** (`src/alg_register.cpp/h`)
+   - 集中式寄存器配置管理
+   - 基于JSON的参数加载
+   - 全局访问的单例模式
+
+4. **主应用程序** (`src/main.cpp`)
+   - 算法编排
+   - 算法和HLS模型间的交叉验证
+   - 文件I/O和数据管理
+
+### 数据流 (Data Flow)
+```
+JSON配置 → AlgRegister → 算法模块 → HLS模块 → 验证
+     ↓              ↓              ↓              ↓           ↓
+vibe.json    寄存器值      算法处理     HLS流处理    交叉检查结果
+```
+
+## 实现历史 (Implementation History)
+
+### 第一阶段：基础算法实现
+1. 将alg_crop.cpp中的通用代码重构到algo_common.cpp和algo_common.h
+   - 创建通用数据类型和工具函数
+   - 更新alg_crop.cpp以使用通用函数
+
+2. 标准化alg_dpc.cpp以匹配alg_crop.cpp格式
+   - 将类接口改为使用静态方法
+   - 更新函数名和参数以保持一致性
+   - 使用通用的alg_pixel_t数据类型
+
+3. 将alg_dpc函数调用集成到main.cpp中
+   - 在crop_image后添加process_image调用
+   - 实现类似命名约定的DPC输出保存到文件
+   - 为裁剪图像添加正确的宽度/高度计算
+
+4. 更新CMakeLists.txt以包含新的源文件
+
+### 第二阶段：寄存器管理优化（最新）
+5. **创建AlgRegister类系统**
+   - **问题**：手动寄存器参数传递繁琐且容易出错
+   - **解决方案**：实现带单例模式的集中式寄存器管理
+   
+   **关键特性：**
+   - 递归JSON解析自动提取所有寄存器信息
+   - 带验证的类型安全寄存器访问
+   - 常用寄存器组的辅助方法（裁剪参数、DPC设置）
+   - 单例模式确保模块间状态一致
+   
+   **创建/修改的文件：**
+   - `src/alg_register.h`: 寄存器管理类定义
+   - `src/alg_register.cpp`: 带静态成员定义的实现
+   - `src/alg_crop.h/cpp`: 添加基于AlgRegister的Run()方法
+   - `src/alg_dpc.h/cpp`: 添加基于AlgRegister的Run()方法
+   - `src/main.cpp`: 简化为使用AlgRegister而非手动参数提取
+   - `CMakeLists.txt`: 将alg_register.cpp添加到构建中
+
+   **实现的好处：**
+   - 减少主函数中的代码复杂性
+   - 消除重复的寄存器参数传递
+   - 提高可维护性 - 新寄存器只需JSON更新
+   - 更好的类型安全和集中验证
+   - 保持与原始接口的向后兼容性
+
+## 当前状态 (Current Status)
+实现已完成并正常工作。程序成功：
+- 使用AlgRegister从JSON加载所有寄存器配置
+- 使用简化接口处理裁剪算法的图像
+- 处理DPC算法的裁剪图像
+- 将两个算法输出保存到单独文件
+- 使用HLS裁剪模型处理图像进行比较
+- 在算法和HLS模型间执行交叉验证
+- **新增**：所有寄存器访问现在通过AlgRegister类集中化和简化
+
+## 文件结构 (File Structure)
+```
+vibe_crop/
+├── src/                      # 源代码目录
+│   ├── main.cpp              # 主应用程序编排
+│   ├── alg_register.h/cpp    # 集中式寄存器管理
+│   ├── alg_crop.h/cpp        # 裁剪算法实现
+│   ├── alg_dpc.h/cpp         # 坏点校正算法
+│   ├── algo_common.h/cpp     # 共享工具和数据类型
+│   ├── hls_crop.h/cpp        # HLS裁剪实现
+│   └── json.hpp              # JSON解析库
+├── data/                     # 数据目录
+│   └── vibe.json             # 寄存器配置文件
+├── build/                    # 构建输出目录
+├── bit/                      # 比特流文件
+│   ├── isp_crop_0816.bit     # FPGA比特流
+│   └── isp_crop_0816.hwh     # 硬件描述文件
+├── py/                       # Python脚本
+│   ├── crop_adapter.py       # 裁剪适配器
+│   ├── crop.py               # 裁剪处理
+│   ├── generate_random_image.py # 随机图像生成
+│   ├── InfiniteISP/          # InfiniteISP库
+│   └── openISP/              # OpenISP库
+├── test/                     # 测试目录
+│   ├── crop.cmd              # 裁剪命令
+│   ├── README.md             # 测试说明
+│   ├── regression_test.py    # 回归测试
+│   └── run_test.sh           # 测试运行脚本
+├── vivado_hls/               # Vivado HLS项目
+├── log/                      # 日志目录
+│   ├── work.log              # 项目工作日志
+│   └── vivado_hls_compile.log # HLS编译日志
+├── CMakeLists.txt            # 构建配置
+├── build_and_run.sh          # 构建和运行脚本
+├── set_env.sh                # 环境设置脚本
+├── sync_c2rtl.sh             # C到RTL同步脚本
+├── sync_linux2win.sh         # Linux到Windows同步
+├── sync_rtl2pynq.sh          # RTL到PYNQ同步
+└── unzip_hls.sh              # HLS解压脚本
+```
+
+## 下一步计划 (Next Steps)
+- 考虑为其他算法模块扩展AlgRegister
+- 为寄存器值范围添加验证
+- 实现运行时寄存器值修改
+- 添加对多个配置文件的支持
+- 优化HLS实现的性能
+- 完善Python测试脚本集成
