@@ -88,6 +88,47 @@ vector<uint16_t> stream_to_vector(hls::stream<axis_pixel_t>& stream) {
     return data;
 }
 
+
+int main(const int argc, const char *argv[]) {
+    try {
+        // 读取JSON配置 - 兼容不同构建目录
+    string config_path = "./vibe.json";
+    ifstream f(config_path);
+    if (!f.is_open()) {
+        // 尝试data子目录路径
+        config_path = "./data/vibe.json";
+        f.open(config_path);
+    }
+    if (!f.is_open()) {
+        // 尝试上级目录的data子目录路径
+        config_path = "../data/vibe.json";
+        f.open(config_path);
+    }
+    if (!f.is_open()) {
+        cerr << "Error: Cannot open vibe.json configuration file" << endl;
+        return 1;
+    }
+
+    cout << "vibe.json configuration file path: " << config_path << endl;
+    
+        json data = json::parse(f);
+        
+        ImageInfo img_info = data["image_info"].get<ImageInfo>();
+        RegisterInfo reg_info = data["register_info"].get<RegisterInfo>();
+        
+        int width = reg_info.reg_image_width[0];
+        int height = reg_info.reg_image_height[0];
+        
+        img_info.print_values();
+        reg_info.print_values();
+        
+        vector<uint16_t> input_image;
+
+        // 生成或读取输入图像 - 多路径兼容处理
+        if (img_info.generate_random_image == 1) {
+            cout << "Generating random image using algorithm model..." << endl;
+            input_image = AlgCrop::generate_random_image(width, height, 255);
+            
             // 保存生成的随机图像到文件
             vector<string> save_paths = {
                 // "../data/" + img_info.random_image_path,
