@@ -3,6 +3,7 @@
 #include "alg_crop.h"
 #include "alg_dpc.h"
 #include "hls_crop.h"
+#include "hls_dpc.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -116,18 +117,25 @@ int main(const int argc, const char *argv[]) {
         ImageInfo img_info = data["image_info"].get<ImageInfo>();
         RegisterInfo reg_info = data["register_info"].get<RegisterInfo>();
         
-        int width = reg_info.reg_image_width[0];
-        int height = reg_info.reg_image_height[0];
-        
+        int width = reg_info.reg_image_width.reg_initial_value[0];
+        int height = reg_info.reg_image_height.reg_initial_value[0];
+
         img_info.print_values();
         reg_info.print_values();
         
-        vector<uint16_t> input_image;
+        vector<uint16_t> input_image;   
 
         // 生成或读取输入图像 - 多路径兼容处理
         if (img_info.generate_random_image == 1) {
             cout << "Generating random image using algorithm model..." << endl;
-            input_image = AlgCrop::generate_random_image(width, height, 255);
+            // 生成随机图像
+            input_image.resize(width * height);
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> distrib(0, 255);
+            for (auto& pixel : input_image) {
+                pixel = static_cast<uint16_t>(distrib(gen));
+            }
             
             // 保存生成的随机图像到文件
             vector<string> save_paths = {
@@ -139,7 +147,7 @@ int main(const int argc, const char *argv[]) {
             bool image_saved = false;
             for (const auto& path : save_paths) {
                 cout << "Trying to save random image: " << path << endl;
-                if (AlgCrop::write_image_to_file(path, input_image)) {
+                if (write_vector_to_file(path, input_image)) {
                     cout << "Successfully saved random image: " << path << endl;
                     image_saved = true;
                     break;
@@ -199,14 +207,18 @@ int main(const int argc, const char *argv[]) {
         
         // 算法模型处理
         cout << "Running algorithm model crop..." << endl;
-        std::vector<uint16_t> alg_result = AlgCrop::crop_image(
-            input_image, width, height,
-            reg_info.reg_crop_start_x[0],
-            reg_info.reg_crop_start_y[0],
-            reg_info.reg_crop_end_x[0],
-            reg_info.reg_crop_end_y[0],
-            reg_info.reg_crop_enable[0] != 0
-        );
+        // 使用算法模型进行裁剪
+            AlgCrop crop_alg;
+            std::vector<uint16_t> alg_result;
+            crop_alg.crop_image(
+                input_image, alg_result,
+                width, height,
+                reg_info.reg_crop_start_x.reg_initial_value[0],
+                reg_info.reg_crop_start_y.reg_initial_value[0],
+                reg_info.reg_crop_end_x.reg_initial_value[0],
+                reg_info.reg_crop_end_y.reg_initial_value[0],
+                reg_info.reg_crop_enable.reg_initial_value[0] != 0
+            );
         
         // 将算法模型的结果写入文件 - 优先尝试data子文件夹，不存在则当前目录
         string alg_output_file;
@@ -219,7 +231,7 @@ int main(const int argc, const char *argv[]) {
         bool alg_data_store = false;
         for (const auto& path : data_paths) {
         // 尝试创建data子文件夹下的文件
-            if (AlgCrop::write_image_to_file(path, alg_result)) {
+            if (write_vector_to_file(path, alg_result)) {
                 alg_output_file = path;
                 cout << "Algorithm model result written to " << alg_output_file << endl;
                 alg_data_store = true;
@@ -235,8 +247,8 @@ int main(const int argc, const char *argv[]) {
         
         // 算法模型DPC处理
         cout << "Running algorithm model DPC..." << endl;
-        int crop_width = reg_info.reg_crop_end_x[0] - reg_info.reg_crop_start_x[0] + 1;
-        int crop_height = reg_info.reg_crop_end_y[0] - reg_info.reg_crop_start_y[0] + 1;
+        int crop_width = reg_info.reg_crop_end_x.reg_initial_value[0] - reg_info.reg_crop_start_x.reg_initial_value[0] + 1;
+        int crop_height = reg_info.reg_crop_end_y.reg_initial_value[0] - reg_info.reg_crop_start_y.reg_initial_value[0] + 1;
         
         std::vector<alg_pixel_t> dpc_result = AlgDpc::process_image(
             alg_result, 
@@ -253,7 +265,7 @@ int main(const int argc, const char *argv[]) {
         };
         bool dpc_data_store = false;
         for (const auto& path : dpc_data_paths) {
-            if (AlgCrop::write_image_to_file(path, dpc_result)) {
+            if (write_vector_to_file(path, dpc_result)) {
                 dpc_output_file = path;
                 cout << "Algorithm DPC model result written to " << dpc_output_file << endl;
                 dpc_data_store = true;
@@ -271,27 +283,57 @@ int main(const int argc, const char *argv[]) {
         cout << "Running HLS model crop..." << endl;
         
         // 准备HLS寄存器
-        RegisterHlsInfo hls_regs;
-        hls_regs.image_width = reg_info.reg_image_width[0];
-        hls_regs.image_height = reg_info.reg_image_height[0];
-        hls_regs.crop_start_x = reg_info.reg_crop_start_x[0];
-        hls_regs.crop_start_y = reg_info.reg_crop_start_y[0];
-        hls_regs.crop_end_x = reg_info.reg_crop_end_x[0];
-        hls_regs.crop_end_y = reg_info.reg_crop_end_y[0];
-        hls_regs.crop_enable = (reg_info.reg_crop_enable[0] != 0) ? 1 : 0;
+        HlsRegisterInfo hls_regs;
+        hls_regs.image_width = reg_info.reg_image_width.reg_initial_value[0];
+        hls_regs.image_height = reg_info.reg_image_height.reg_initial_value[0];
+        hls_regs.crop_start_x = reg_info.reg_crop_start_x.reg_initial_value[0];
+        hls_regs.crop_start_y = reg_info.reg_crop_start_y.reg_initial_value[0];
+        hls_regs.crop_end_x = reg_info.reg_crop_end_x.reg_initial_value[0];
+        hls_regs.crop_end_y = reg_info.reg_crop_end_y.reg_initial_value[0];
+        hls_regs.crop_enable = (reg_info.reg_crop_enable.reg_initial_value[0] != 0) ? 1 : 0;
+        hls_regs.dpc_enable = (reg_info.reg_dpc_enable.reg_initial_value[0] != 0) ? 1 : 0;
+        hls_regs.dpc_threshold = reg_info.reg_dpc_threshold.reg_initial_value[0];
+
+        // 为crop_hls函数准备参数
+        HlsCropRegisterInfo crop_regs;
+        crop_regs.image_width = hls_regs.image_width;
+        crop_regs.image_height = hls_regs.image_height;
+        crop_regs.crop_start_x = hls_regs.crop_start_x;
+        crop_regs.crop_start_y = hls_regs.crop_start_y;
+        crop_regs.crop_end_x = hls_regs.crop_end_x;
+        crop_regs.crop_end_y = hls_regs.crop_end_y;
+        crop_regs.crop_enable = hls_regs.crop_enable;
         
         // 创建HLS流
         hls::stream<axis_pixel_t> input_stream;
-        hls::stream<axis_pixel_t> output_stream;
+        hls::stream<axis_pixel_t> crop_output_stream;
         
         // 将输入数据转换为HLS流
         vector_to_stream(input_image, input_stream);
         
-        // 运行HLS模型
-        crop_hls(input_stream, output_stream, hls_regs);
-        
-        // 将HLS输出转换为vector
-        vector<uint16_t> hls_result = stream_to_vector(output_stream);
+        // 运行HLS裁剪模型
+        crop_hls(input_stream, crop_output_stream, crop_regs);
+
+        // 将裁剪后的流转换为vector，再转换为DPC输入流
+        vector<uint16_t> crop_result = stream_to_vector(crop_output_stream);
+        hls::stream<axis_pixel_t> dpc_input_stream;
+        vector_to_stream(crop_result, dpc_input_stream);
+
+        // 准备HLS DPC寄存器
+        HlsDpcRegisterInfo dpc_regs;
+        dpc_regs.image_width = reg_info.reg_crop_end_x.reg_initial_value[0] - reg_info.reg_crop_start_x.reg_initial_value[0] + 1;
+        dpc_regs.image_height = reg_info.reg_crop_end_y.reg_initial_value[0] - reg_info.reg_crop_start_y.reg_initial_value[0] + 1;
+        dpc_regs.dpc_enable = hls_regs.dpc_enable;
+        dpc_regs.dpc_threshold = hls_regs.dpc_threshold;
+
+        // 创建额外的流用于DPC处理
+        hls::stream<axis_pixel_t> dpc_output_stream;
+
+        // 运行HLS DPC模型
+        dpc_hls(dpc_input_stream, dpc_output_stream, dpc_regs);
+
+        // 将HLS DPC输出转换为vector
+        vector<uint16_t> hls_result = stream_to_vector(dpc_output_stream);
         
         // 将HLS模型的结果写入文件 - 优先尝试data子文件夹，不存在则当前目录
         string hls_output_file;

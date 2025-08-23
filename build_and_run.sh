@@ -1,1 +1,1 @@
-cd build && cmake .. && make && cd .. && ./build/vibe_crop
+cd build && cmake .. && make && cd .. && ./build/vibe

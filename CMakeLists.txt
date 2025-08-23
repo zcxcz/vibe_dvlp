@@ -22,6 +22,7 @@ add_executable(${PROJECT_NAME}
     src/alg_crop.cpp
     src/alg_dpc.cpp
     src/hls_crop.cpp
+    src/hls_dpc.cpp
 )
 
 # Include header directories

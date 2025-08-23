@@ -4,7 +4,7 @@
 void crop_hls(
     hls::stream<axis_pixel_t>& input_stream,
     hls::stream<axis_pixel_t>& output_stream,
-    const RegisterHlsInfo& regs
+    const HlsCropRegisterInfo& regs
 ) {
     #pragma HLS INTERFACE axis port=input_stream
     #pragma HLS INTERFACE axis port=output_stream
@@ -12,7 +12,7 @@ void crop_hls(
     #pragma HLS INTERFACE s_axilite port=return bundle=control
     
 
-    RegisterHlsInfo dummy = regs;
+    HlsCropRegisterInfo dummy = regs;
 
 
     if (!regs.crop_enable) {
@@ -35,8 +35,8 @@ void crop_hls(
     ap_uint<16> y_cnt = 0;
     ap_uint<16> x_cnt = 0;
     ap_uint<32> output_count = 0;
-    ap_uint<32> expected_output = (regs.crop_end_y - regs.crop_start_y + 1) * 
-                                  (regs.crop_end_x - regs.crop_start_x + 1);
+    ap_uint<32> expected_output = (ap_uint<32>(regs.crop_end_y) - regs.crop_start_y + 1) * 
+                                  (ap_uint<32>(regs.crop_end_x) - regs.crop_start_x + 1);
     
     // 需要跟踪当前帧是否结束
     bool frame_end = false;
@@ -62,11 +62,14 @@ void crop_hls(
             
             bool crop_count_end = (output_count == expected_output);
             
+            // 如果是裁剪区域的最后一个像素，设置last信号
             if (crop_count_end) {
                 data_pkt.last = 1;
-            } else {
+            } else if (!frame_end) {
+                // 如果不是原始帧的结束，保持last为0
                 data_pkt.last = 0;
             }
+            // 如果是原始帧的结束且在裁剪区域外，则不修改last信号
 
             if (in_crop_region) {
                 output_stream.write(data_pkt);
