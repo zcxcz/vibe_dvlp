@@ -1,0 +1,14 @@
+{
+    "width": 1920,
+    "height": 1080,
+    "crop_start_x": 100,
+    "crop_start_y": 100,
+    "crop_end_x": 1820,
+    "crop_end_y": 980,
+    "crop_enable": true,
+    "dpc_enable": true,
+    "dpc_threshold": 10,
+    "input_file": "input_image.txt",
+    "crop_output_file": "hls_crop_output.txt",
+    "dpc_output_file": "hls_dpc_output.txt"
+}

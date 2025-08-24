@@ -1,7 +1,8 @@
 #include "hls_crop.h"
 #include <hls_stream.h>
 
-void crop_hls(
+// HlsCrop类的process方法实现
+void HlsCrop::process(
     hls::stream<axis_pixel_t>& input_stream,
     hls::stream<axis_pixel_t>& output_stream,
     const HlsCropRegisterInfo& regs
@@ -11,9 +12,8 @@ void crop_hls(
     #pragma HLS INTERFACE s_axilite port=regs bundle=control
     #pragma HLS INTERFACE s_axilite port=return bundle=control
     
-
+    // 防止编译器优化掉未使用的regs
     HlsCropRegisterInfo dummy = regs;
-
 
     if (!regs.crop_enable) {
         // 如果crop未启用，直接透传所有数据（包括last信号）
