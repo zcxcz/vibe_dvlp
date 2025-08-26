@@ -2,7 +2,7 @@
 #include <hls_math.h>
 
 // 定义静态成员变量
-ap_uint<DATA_WIDTH> HlsDpc::hls_dpc_linebuffer[5][HLS_DPC_LINEBUFFER_DEPTH] = {};
+ap_uint<DATA_WIDTH> HlsDpc::hls_dpc_linebuffer[4][HLS_DPC_LINEBUFFER_DEPTH] = {};
 
 // HlsDpc类的私有方法实现：裁剪值到指定范围
 ap_uint<16> HlsDpc::clip(ap_uint<16> value, ap_uint<16> min, ap_uint<16> max) {
@@ -33,7 +33,6 @@ void HlsDpc::process(
                 axis_pixel_t data_pkt = input_stream.read();
                 output_stream.write(data_pkt);
             }
-}
         }
         return;
     }
@@ -153,5 +152,6 @@ void HlsDpc::process(
                 
                 output_stream.write(output_pkt);
             }
+        }
     }
 }

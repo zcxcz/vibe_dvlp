@@ -6,6 +6,7 @@
 #include <vector>
 #include <random>
 #include <string>
+#include <unistd.h>
 
 using json = nlohmann::json;
 using namespace std;
@@ -30,16 +31,54 @@ vector<uint16_t> read_data_to_vector(const string& filename) {
 
 // 工具函数：从vector写入数据到txt文件
 bool write_vector_to_file(const string& filename, const vector<uint16_t>& data) {
-    ofstream output_file(filename);
+    // 检查文件是否存在
+    bool file_exists = (access(filename.c_str(), F_OK) == 0);
+    
+    if (file_exists) {
+        cout << "Output file exists: " << filename << ", trying to open..." << endl;
+    } else {
+        cout << "Output file does not exist: " << filename << ", preparing to create..." << endl;
+        
+        // 确保目录存在
+        string dir = ".";
+        size_t last_slash = filename.find_last_of("/");
+        if (last_slash != string::npos) {
+            dir = filename.substr(0, last_slash);
+            cout << "Creating directory path: " << dir << endl;
+            
+            // 创建目录（如果不存在）
+            #ifdef _WIN32
+                system( ("mkdir " + dir).c_str() );
+            #else
+                system( ("mkdir -p " + dir).c_str() );
+            #endif
+        }
+    }
+    
+    // 打开文件，确保使用正确的模式创建文件
+    ofstream output_file(filename, ios::out | ios::trunc);
     if (!output_file) {
-        cerr << "Cannot open output file: " << filename << endl;
+        cerr << "Failed to open output file: " << filename << endl;
+        cerr << "Check directory permissions and available space" << endl;
         return false;
     }
+    
+    cout << "Successfully opened output file: " << filename << endl;
     
     for (const auto& value : data) {
         output_file << static_cast<int>(value) << "\n";
     }
+    
+    // 刷新缓冲区并检查写入是否成功
+    output_file.flush();
+    if (output_file.fail()) {
+        cerr << "Error writing data to file: " << filename << endl;
+        output_file.close();
+        return false;
+    }
+    
     output_file.close();
+    cout << "Successfully wrote " << data.size() << " values to file: " << filename << endl;
     return true;
 }
 
@@ -76,23 +115,11 @@ AlgTopConfig load_config(const string& config_path) {
     AlgTopConfig config;
     ifstream f(config_path);
     if (!f.is_open()) {
-        cerr << "Error: Cannot open config file: " << config_path << endl;
-        // 使用默认配置
-        config.width = 1920;
-        config.height = 1080;
-        config.crop_start_x = 100;
-        config.crop_start_y = 100;
-        config.crop_end_x = 1820;
-        config.crop_end_y = 980;
-        config.crop_enable = true;
-        config.dpc_enable = true;
-        config.dpc_threshold = 10;
-        config.input_file = "input_image.txt";
-        config.crop_output_file = "alg_crop_output.txt";
-        config.dpc_output_file = "alg_dpc_output.txt";
+        cout << "Error: Cannot open config file: " << config_path << endl;
         return config;
     }
     
+    cout << "Success: Open config file: " << config_path << endl;
     json data = json::parse(f);
     config.width = data["register_info"]["reg_image_width"]["reg_initial_value"][0];
     config.height = data["register_info"]["reg_image_height"]["reg_initial_value"][0];

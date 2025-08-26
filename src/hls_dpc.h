@@ -20,7 +20,7 @@ struct HlsDpcRegisterInfo {
 class HlsDpc {
 private:
     // 辅助函数：获取带镜像边界的像素值
-    static ap_uint<DATA_WIDTH> hls_dpc_linebuffer[5][HLS_DPC_LINEBUFFER_DEPTH];
+    static ap_uint<DATA_WIDTH> hls_dpc_linebuffer[4][HLS_DPC_LINEBUFFER_DEPTH];
     
     // 辅助函数：裁剪值到指定范围
     ap_uint<16> clip(ap_uint<16> value, ap_uint<16> min, ap_uint<16> max);

@@ -52,7 +52,7 @@ vector<uint16_t> generate_random_image(int width, int height) {
     std::uniform_int_distribution<> distrib(0, 255);
     for (auto& pixel : image) {
         pixel = static_cast<uint16_t>(distrib(gen));
-    }
+    } 
     return image;
 }
 
@@ -102,23 +102,11 @@ HlsTopConfig load_config(const string& config_path) {
     HlsTopConfig config;
     ifstream f(config_path);
     if (!f.is_open()) {
-        cerr << "Error: Cannot open config file: " << config_path << endl;
-        // 使用默认配置
-        config.width = 1920;
-        config.height = 1080;
-        config.crop_start_x = 100;
-        config.crop_start_y = 100;
-        config.crop_end_x = 1820;
-        config.crop_end_y = 980;
-        config.crop_enable = true;
-        config.dpc_enable = true;
-        config.dpc_threshold = 10;
-        config.input_file = "input_image.txt";
-        config.crop_output_file = "hls_crop_output.txt";
-        config.dpc_output_file = "hls_dpc_output.txt";
+        cout << "Error: Cannot open config file: " << config_path << endl;
         return config;
     }
     
+    cout << "Success: Open config file: " << config_path << endl;
     json data = json::parse(f);
     config.width = data["register_info"]["reg_image_width"]["reg_initial_value"][0];
     config.height = data["register_info"]["reg_image_height"]["reg_initial_value"][0];

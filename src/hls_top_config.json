@@ -9,6 +9,6 @@
     "dpc_enable": true,
     "dpc_threshold": 10,
     "input_file": "input_image.txt",
-    "crop_output_file": "hls_crop_output.txt",
-    "dpc_output_file": "hls_dpc_output.txt"
+    "crop_output_file": "data/hls_crop_output.txt",
+    "dpc_output_file": "data/hls_dpc_output.txt"
 }

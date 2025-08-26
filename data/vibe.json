@@ -1,10 +1,10 @@
 {
   "common": {
     "input_file": "input_image.txt",
-    "alg_crop_output_file": "alg_crop_output.txt",
-    "alg_dpc_output_file": "alg_dpc_output.txt",
-    "hls_crop_output_file": "hls_crop_output.txt",
-    "hls_dpc_output_file": "hls_dpc_output.txt"
+    "alg_crop_output_file": "data/alg_crop_output.txt",
+    "alg_dpc_output_file": "data/alg_dpc_output.txt",
+    "hls_crop_output_file": "data/hls_crop_output.txt",
+    "hls_dpc_output_file": "data/hls_dpc_output.txt"
   },
   "image_info": {
     "image_path": "image.txt",
