@@ -1,8 +1,11 @@
 #include "hls_dpc.h"
+#include "hls_crop.h"
 #include <hls_math.h>
 
+using namespace std;
+
 // 定义静态成员变量
-ap_uint<DATA_WIDTH> HlsDpc::hls_dpc_linebuffer[4][HLS_DPC_LINEBUFFER_DEPTH] = {};
+ap_uint<DATA_WIDTH*2> HlsDpc::hls_dpc_linebuffer[4][(HLS_DPC_LINEBUFFER_DEPTH+1)/2] = {};
 
 // HlsDpc类的私有方法实现：裁剪值到指定范围
 ap_uint<16> HlsDpc::clip(ap_uint<16> value, ap_uint<16> min, ap_uint<16> max) {
@@ -11,8 +14,96 @@ ap_uint<16> HlsDpc::clip(ap_uint<16> value, ap_uint<16> min, ap_uint<16> max) {
     return value;
 }
 
+void HlsDpc::ProcessDpc(ap_uint<DATA_WIDTH>* pixel_window, ap_uint<DATA_WIDTH>& pixel_out, const HlsDpcRegisterInfo& regs) {
+
+    // 初始化校正像素为中心像素
+    pixel_out = pixel_window[4];
+    // min/max judgement
+    ap_int<DATA_WIDTH> min_stg_1[4] = {};
+    ap_int<DATA_WIDTH> max_stg_1[4] = {};
+    ap_int<DATA_WIDTH> min_stg_2[2] = {};
+    ap_int<DATA_WIDTH> max_stg_2[2] = {};
+    ap_int<DATA_WIDTH> min_stg_3[1] = {};
+    ap_int<DATA_WIDTH> max_stg_3[1] = {};
+    for (int i=0; i<4; i++) {
+        min_stg_1[i] = pixel_window[i] >= pixel_window[i+4] ? pixel_window[i+4] : pixel_window[i];
+        max_stg_1[i] = pixel_window[i] >= pixel_window[i+4] ? pixel_window[i] : pixel_window[i+4];
+    }
+    for (int i=0; i<2; i++) {
+        min_stg_2[i] = min_stg_1[i*2] >= min_stg_1[i*2+1] ? min_stg_1[i*2+1] : min_stg_1[i*2];
+        max_stg_2[i] = max_stg_1[i*2] >= max_stg_1[i*2+1] ? max_stg_1[i*2] : max_stg_1[i*2+1];
+    }
+    min_stg_3[0] = min_stg_2[0] >= min_stg_2[1] ? min_stg_2[1] : min_stg_2[0];
+    max_stg_3[0] = max_stg_2[0] >= max_stg_2[1] ? max_stg_2[0] : max_stg_2[1];
+    ap_int<DATA_WIDTH> min_neighbor = min_stg_3[0];
+    ap_int<DATA_WIDTH> max_neighbor = max_stg_3[0];
+    bool cond1_met = (pixel_window[4] < min_neighbor) || (pixel_window[4] > max_neighbor);
+    
+    // threshold judgement
+    bool cond2_met = false;
+    ap_int<DATA_WIDTH+1> diff_2p[8];
+    ap_uint<DATA_WIDTH+1> abs_diff_2p[8];
+    ap_int<8> diff_2p_gt_thr;
+    if (cond1_met) {
+        for (int i = 0; i < 4; ++i) {
+            diff_2p[i] = (ap_int<DATA_WIDTH+1>)pixel_window[i] - (ap_int<DATA_WIDTH+1>)pixel_window[4];
+            diff_2p[i+4] = (ap_int<DATA_WIDTH+1>)pixel_window[i+4] - (ap_int<DATA_WIDTH+1>)pixel_window[4];
+            abs_diff_2p[i] = hls::abs(diff_2p[i]);
+            abs_diff_2p[i+4] = hls::abs(diff_2p[i+4]);
+            diff_2p_gt_thr[i] = (abs_diff_2p[i] > regs.dpc_threshold);
+            diff_2p_gt_thr[i+4] = (abs_diff_2p[i+4] > regs.dpc_threshold);
+        }
+        cond2_met = &diff_2p_gt_thr;
+    }
+    
+    // do dpc when cond1 && cond2 both valid
+    if (cond1_met && cond2_met) {
+        ap_int<DATA_WIDTH + 2> dv = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_window[1] + (ap_int<DATA_WIDTH + 2>)pixel_window[4]<<1 - (ap_int<DATA_WIDTH + 2>)pixel_window[7]);
+        ap_int<DATA_WIDTH + 2> dh = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_window[3] + (ap_int<DATA_WIDTH + 2>)pixel_window[4]<<1 - (ap_int<DATA_WIDTH + 2>)pixel_window[5]);
+        ap_int<DATA_WIDTH + 2> ddr = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_window[0] + (ap_int<DATA_WIDTH + 2>)pixel_window[4]<<1 - (ap_int<DATA_WIDTH + 2>)pixel_window[8]);
+        ap_int<DATA_WIDTH + 2> ddl = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_window[2] + (ap_int<DATA_WIDTH + 2>)pixel_window[4]<<1 - (ap_int<DATA_WIDTH + 2>)pixel_window[6]);
+        
+        // find min grad
+        ap_int<DATA_WIDTH + 2> min_grad;
+        ap_int<DATA_WIDTH + 2> min_grad_stg_1[2];
+        ap_int<DATA_WIDTH + 2> min_grad_stg_2[1];
+        ap_int<1> min_grad_stg_1_flag[2];
+        ap_int<1> min_grad_stg_2_flag[1];
+        min_grad_stg_1_flag[0] = dv >= dh ? 1 : 0;
+        min_grad_stg_1_flag[1] = ddl >= ddr ? 1 : 0;
+        min_grad_stg_2_flag[0] = min_grad_stg_1[0] >= min_grad_stg_1[1] ? 1 : 0;
+        min_grad_stg_1[0] = min_grad_stg_1_flag[0] ? dv : dh;
+        min_grad_stg_1[1] = min_grad_stg_1_flag[1] ? ddl : ddr;
+        min_grad_stg_2[0] = min_grad_stg_2_flag[0] ? min_grad_stg_1[1] : min_grad_stg_1[0];
+        min_grad = min_grad_stg_2[0];
+        
+        // correction in min grad
+        if (min_grad_stg_2_flag[0]) {
+            if (min_grad_stg_1_flag[0]) {
+                // correction in vertical
+                ap_uint<DATA_WIDTH> new_p0 = (pixel_window[1] + pixel_window[7]) / 2;
+                pixel_out = new_p0;
+            } else {
+                // correction in horizontal
+                ap_uint<DATA_WIDTH> new_p0 = (pixel_window[3] + pixel_window[5]) / 2;
+                pixel_out = new_p0;
+            }
+        } else {
+            if (min_grad_stg_1_flag[1]) {
+                // correction in left diagonal
+                ap_uint<DATA_WIDTH> new_p0 = (pixel_window[0] + pixel_window[8]) / 2;
+                pixel_out = new_p0;
+            } else {
+                // correction in right diagonal
+                ap_uint<DATA_WIDTH> new_p0 = (pixel_window[2] + pixel_window[6]) / 2;
+                pixel_out = new_p0;
+            }
+        }
+    }
+}
+
 // HlsDpc类的process方法实现
-void HlsDpc::process(
+void HlsDpc::Process(
     hls::stream<axis_pixel_t>& input_stream,
     hls::stream<axis_pixel_t>& output_stream,
     const HlsDpcRegisterInfo& regs
@@ -23,183 +114,113 @@ void HlsDpc::process(
     #pragma HLS INTERFACE s_axilite port=return bundle=control
     #pragma HLS RESOURCE variable=hls_dpc_linebuffer core=RAM_2P
     
+    ap_uint<16> cnt_y = 0;
+    ap_uint<16> cnt_x = 0;
+    axis_pixel_t input_data_pkt;
+    axis_pixel_t output_data_pkt;
+    
     // 如果DPC未启用，直接透传数据
     if (!regs.dpc_enable) {
-        ap_uint<16> y_cnt = 0;
-        ap_uint<16> x_cnt = 0;
-        for(y_cnt = 0; y_cnt < regs.image_height; y_cnt++) {
-            for(x_cnt = 0; x_cnt < regs.image_width; x_cnt++) {
+        for(cnt_y = 0; cnt_y < regs.image_height; cnt_y++) {
+            for(cnt_x = 0; cnt_x < regs.image_width; cnt_x++) {
                 #pragma HLS PIPELINE II=1
-                axis_pixel_t data_pkt = input_stream.read();
-                output_stream.write(data_pkt);
+                axis_pixel_t input_data_pkt = input_stream.read();
+                output_stream.write(input_data_pkt);
             }
         }
         return;
     }
 
-    // DPC处理
-    
-    // 1. 定义5x5寄存器组用于缓存当前运算可视域像素
-    ap_uint<DATA_WIDTH> pixel_window[5][5] = {};
-    #pragma HLS ARRAY_PARTITION variable=pixel_window complete dim=1
+    // visual domain window
+    ap_uint<DATA_WIDTH> pixel_window[3][5] = {0};
+    ap_uint<DATA_WIDTH> pixel_win_remap[3][5] = {};
+    ap_uint<DATA_WIDTH> pixel_process_window[9] = {};
     #pragma HLS ARRAY_PARTITION variable=pixel_window complete dim=2
     
-    // 2. 行计数器和列计数器
-    ap_uint<16> cnt_x = 0;
-    ap_uint<16> cnt_y = 0;
+    // 初始化
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 5; j++) {
+            pixel_window[i][j] = 0;
+        }
+    }
     
-    // 3. 从第5行开始运算，从第6行开始循环覆盖
-    for (cnt_y = 0; cnt_y < regs.image_height + 4; cnt_y++) {
-        for (cnt_x = 0; cnt_x < regs.image_width + 4; cnt_x++) {
+    // 处理图像
+    ap_int<DATA_WIDTH> input_pixel_data;
+    ap_int<DATA_WIDTH> last_input_pixel_data;
+    for (cnt_y = 0; cnt_y < regs.image_height+2; cnt_y++) {
+        for (cnt_x = 0; cnt_x < regs.image_width+2; cnt_x++) {
             #pragma HLS PIPELINE II=1
             
-            // 读取输入数据并更新linebuffer
+            // input data update
             if (cnt_y < regs.image_height && cnt_x < regs.image_width) {
-                axis_pixel_t data_pkt = input_stream.read();
-                // 从第6行开始循环覆盖（第5行后）
-                hls_dpc_linebuffer[(cnt_y >= 5) ? (ap_uint<16>)((cnt_y - 1) % 4) : cnt_y][cnt_x] = data_pkt.data;
-            }
-            
-            // 更新5x5寄存器窗口
-            // 只从有效像素区域读取数据
-            if (cnt_y < regs.image_height + 2 && cnt_x < regs.image_width + 2) {
-                // 从linebuffer读取数据填充5x5窗口
-                if (cnt_y >= 1 && cnt_y <= regs.image_height + 2 && 
-                    cnt_x >= 1 && cnt_x <= regs.image_width + 2) {
-                    
-                    // 计算实际坐标
-                    ap_uint<16> real_y = cnt_y - 1;
-                    ap_uint<16> real_x = cnt_x - 1;
-                    
-                    // 计算在linebuffer中的索引
-                    ap_uint<3> lb_y = 0;
-                    if (real_y >= 5) {
-                        lb_y = (real_y - 1) % 4; // 从第6行开始循环覆盖
-                    } else {
-                        lb_y = real_y;
-                    }
-                    
-                    // 获取像素数据，如果超出范围则使用边界镜像
-                    if (real_y < regs.image_height && real_x < regs.image_width) {
-                        pixel_window[cnt_y % 5][cnt_x % 5] = hls_dpc_linebuffer[lb_y][real_x];
-                    } else {
-                        // 镜像边界处理
-                        ap_uint<16> mirror_y = (real_y >= regs.image_height) ? (ap_uint<16>)(2 * regs.image_height - 1 - real_y) : real_y;
-                        ap_uint<16> mirror_x = (real_x >= regs.image_width) ? (ap_uint<16>)(2 * regs.image_width - 1 - real_x) : real_x;
-                        
-                        // 确保镜像后的值在有效范围内
-                        mirror_y = clip(mirror_y, 0, regs.image_height - 1);
-                        mirror_x = clip(mirror_x, 0, regs.image_width - 1);
-                        
-                        // 计算镜像后的linebuffer索引
-                        ap_uint<3> mirror_lb_y = 0;
-                        if (mirror_y >= 5) {
-                            mirror_lb_y = (mirror_y - 1) % 4;
-                        } else {
-                            mirror_lb_y = mirror_y;
-                        }
-                        
-                        pixel_window[cnt_y % 5][cnt_x % 5] = hls_dpc_linebuffer[mirror_lb_y][mirror_x];
-                    }
+                
+                // linebuffer read
+                // axis_pixel_t input_data_pkt[2];
+                // if (cnt_y > 0 && cnt_x < regs.image_width && cnt_x[0]==0) {
+                //     input_data_pkt[0] = hls_dpc_linebuffer[cnt_y%5][cnt_x>>1][DATA_WIDTH-1:0];
+                //     input_data_pkt[1] = hls_dpc_linebuffer[cnt_y%5][cnt_x>>1][2*DATA_WIDTH-1:DATA_WIDTH];
+                // }
+
+                // linebuffer write
+                last_input_pixel_data = input_pixel_data;
+                input_pixel_data = input_stream.read().data;
+                if (cnt_x[0]==1) {
+                    hls_dpc_linebuffer[cnt_y%5][cnt_x>>1] = input_pixel_data, last_input_pixel_data;
                 }
             }
-            
-            // 从第5行开始运算（cnt_y从4开始）
-            if (cnt_y >= 4 && cnt_x >= 4 && cnt_y < regs.image_height + 4 && cnt_x < regs.image_width + 4) {
-                // 提取3x3邻域像素数据
-                ap_uint<DATA_WIDTH> pixel_data[9] = {};
-                ap_uint<4> pixel_index = 0;
-                
-                // 从5x5窗口中心提取3x3邻域
-                for (int j = 0; j < 3; j++) {
-                    for (int i = 0; i < 3; i++) {
-                        #pragma HLS PIPELINE II=1
-                        pixel_data[pixel_index++] = pixel_window[(cnt_y - 4 + j) % 5][(cnt_x - 4 + i) % 5];
+
+            // update 3x5 visual domain window
+            if (cnt_x > 1 && cnt_y > 1) {
+                // previous data update,
+                for (int y=0; y<2; y++) {
+                    if (cnt_x[0]==0) {
+                        pixel_window[y][cnt_x%5] = hls_dpc_linebuffer[clip(cnt_y-4+2*y, 0, regs.image_height-1)%5][cnt_x>>1](DATA_WIDTH-1, 0);
+                    } else {
+                        pixel_window[y][cnt_x%5] = hls_dpc_linebuffer[clip(cnt_y-4+2*y, 0, regs.image_height-1)%5][cnt_x>>1](2*DATA_WIDTH-1, DATA_WIDTH);
                     }
                 }
-                
-                // 条件1: 中心像素是否小于或大于其8个邻居中的最小值或最大值
-                ap_uint<DATA_WIDTH> min_neighbor = pixel_data[0];
-                ap_uint<DATA_WIDTH> max_neighbor = pixel_data[0];
-                for (int i = 1; i < 9; ++i) {
-                    #pragma HLS PIPELINE II=1
-                    if (pixel_data[i] < min_neighbor) min_neighbor = pixel_data[i];
-                    if (pixel_data[i] > max_neighbor) max_neighbor = pixel_data[i];
-                }
-                bool cond1_met = (pixel_data[4] < min_neighbor) || (pixel_data[4] > max_neighbor);
-                
-                // 条件2: 中心像素与所有8个邻居的差的绝对值是否都大于阈值
-                bool cond2_met = true;
-                if (cond1_met) {
-                    // 3x3邻域
-                    ap_uint<DATA_WIDTH> abs_diff_2p[9];
-                    ap_int<DATA_WIDTH+1> diff_2p[9];
-                    for (int i = 0; i < 9; ++i) {
-                        diff_2p[i] = (ap_int<DATA_WIDTH+1>)pixel_data[i] - (ap_int<DATA_WIDTH+1>)pixel_data[4];
-                        abs_diff_2p[i] = hls::abs(diff_2p[i]);
-                        if ( (i!=4) && (abs_diff_2p[i] <= regs.dpc_threshold) ) {
-                            cond2_met = false;
-                            break;
-                        }
-                    }
+                // current data update
+                if (cnt_y > regs.image_height) {
+                    pixel_window[2][cnt_x%5] = pixel_window[1][cnt_x%5];
                 } else {
-                    cond2_met = false;
+                    pixel_window[2][cnt_x%5] = input_pixel_data;
                 }
-                
-                // 初始化校正像素为中心像素
-                ap_uint<DATA_WIDTH> corrected_pixel = pixel_data[4];
-                
-                // 如果两个条件都满足，则判定为坏点并校正
-                if (cond1_met && cond2_met) {
-                    // --- 坏点校正 ---
-                    // 计算四个方向的梯度
-                    ap_int<DATA_WIDTH + 2> dv = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_data[1] + 2*(ap_int<DATA_WIDTH + 2>)pixel_data[4] - (ap_int<DATA_WIDTH + 2>)pixel_data[7]);
-                    ap_int<DATA_WIDTH + 2> dh = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_data[3] + 2*(ap_int<DATA_WIDTH + 2>)pixel_data[4] - (ap_int<DATA_WIDTH + 2>)pixel_data[5]);
-                    ap_int<DATA_WIDTH + 2> ddr = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_data[0] + 2*(ap_int<DATA_WIDTH + 2>)pixel_data[4] - (ap_int<DATA_WIDTH + 2>)pixel_data[8]);
-                    ap_int<DATA_WIDTH + 2> ddl = hls::abs(-(ap_int<DATA_WIDTH + 2>)pixel_data[2] + 2*(ap_int<DATA_WIDTH + 2>)pixel_data[4] - (ap_int<DATA_WIDTH + 2>)pixel_data[6]);
-                    
-                    // 找到最小梯度
-                    ap_int<DATA_WIDTH + 2> min_grad = dv;
-                    if (dh < min_grad) min_grad = dh;
-                    if (ddl < min_grad) min_grad = ddl;
-                    if (ddr < min_grad) min_grad = ddr;
-                    
-                    // 应用最小梯度方向的修正
-                    if (min_grad == dv) {
-                        // 垂直方向修正 (上+下)
-                        ap_uint<DATA_WIDTH> new_p0 = (pixel_data[1] + pixel_data[7]) / 2;
-                        corrected_pixel = new_p0;
-                    } else if (min_grad == dh) {
-                        // 水平方向修正
-                        ap_uint<DATA_WIDTH> new_p0 = (pixel_data[3] + pixel_data[5]) / 2;
-                        corrected_pixel = new_p0;
-                    } else if (min_grad == ddl) {
-                        // 左对角线方向修正
-                        ap_uint<DATA_WIDTH> new_p0 = (pixel_data[0] + pixel_data[8]) / 2;
-                        corrected_pixel = new_p0;
-                    } else if (min_grad == ddr) {
-                        // 右对角线方向修正
-                        ap_uint<DATA_WIDTH> new_p0 = (pixel_data[2] + pixel_data[6]) / 2;
-                        corrected_pixel = new_p0;
+
+                // window data rearrange
+                for (int y=0; y<3; y++) {
+                    for (int x=0; x<3; x++) {
+                        pixel_win_remap[y][x] = pixel_window[y][clip(cnt_x-4+2*x, 0, regs.image_width-1)%5];
                     }
                 }
-                    
-                // 计算当前输出像素的坐标
-                ap_uint<16> x_out = cnt_x - 4;
-                ap_uint<16> y_out = cnt_y - 4;
                 
-                // 确保坐标在有效范围内
-                if (x_out < regs.image_width && y_out < regs.image_height) {
-                    // 写入输出流
-                    axis_pixel_t output_pkt;
-                    output_pkt.data = corrected_pixel;
-                    output_pkt.keep = -1;  // 全字节有效
-                    output_pkt.strb = -1;
-                    output_pkt.last = (y_out == regs.image_height - 1) && (x_out == regs.image_width - 1);
-                    
-                    output_stream.write(output_pkt);
+                cout << cnt_y << " " << cnt_x << endl;
+                cout << pixel_win_remap[0][0] << " " << pixel_win_remap[0][1] << " " << pixel_win_remap[0][2] << endl;
+                cout << pixel_win_remap[1][0] << " " << pixel_win_remap[1][1] << " " << pixel_win_remap[1][2] << endl;
+                cout << pixel_win_remap[2][0] << " " << pixel_win_remap[2][1] << " " << pixel_win_remap[2][2] << endl;
+
+                // pixel process
+                for (int y=0; y<3; y++) {
+                    for (int x=0; x<3; x++) {
+                        pixel_process_window[y*3+x] = pixel_win_remap[y][x];
+                    }
                 }
+                ap_uint<DATA_WIDTH> pixel_output;
+                axis_pixel_t axis_pixel_t_output;
+                ProcessDpc(pixel_process_window, pixel_output, regs);
+                if (cnt_x==regs.image_width-1) {
+                    axis_pixel_t_output.data = pixel_output;
+                    axis_pixel_t_output.keep = 0x03;
+                    axis_pixel_t_output.last = 1;
+                    output_stream.write(axis_pixel_t_output);
+                } else {
+                    axis_pixel_t_output.data = pixel_output;
+                    axis_pixel_t_output.keep = 0x03;
+                    axis_pixel_t_output.last = 0;
+                    output_stream.write(axis_pixel_t_output);
+                }
+
             }
+            
         }
     }
 }

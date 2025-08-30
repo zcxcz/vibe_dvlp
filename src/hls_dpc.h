@@ -19,18 +19,21 @@ struct HlsDpcRegisterInfo {
 // HLS DPC类
 class HlsDpc {
 private:
-    // 辅助函数：获取带镜像边界的像素值
-    static ap_uint<DATA_WIDTH> hls_dpc_linebuffer[4][HLS_DPC_LINEBUFFER_DEPTH];
+    // 行缓冲区定义 - 使用与hls_crop.h中一致的类型
+    static ap_uint<DATA_WIDTH*2> hls_dpc_linebuffer[4][(HLS_DPC_LINEBUFFER_DEPTH+1)/2];
     
     // 辅助函数：裁剪值到指定范围
     ap_uint<16> clip(ap_uint<16> value, ap_uint<16> min, ap_uint<16> max);
     
-    public:
+    // 内部DPC处理函数
+    void ProcessDpc(ap_uint<DATA_WIDTH>* pixel_window, ap_uint<DATA_WIDTH>& pixel_out, const HlsDpcRegisterInfo& regs);
+    
+public:
     HlsDpc() {};
     ~HlsDpc() {};
     
     // DPC处理函数
-    void process(
+    void Process(
         hls::stream<axis_pixel_t>& input_stream,
         hls::stream<axis_pixel_t>& output_stream,
         const HlsDpcRegisterInfo& regs

@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
         dpc_regs.dpc_enable = config.dpc_enable ? 1 : 0;
         dpc_regs.dpc_threshold = config.dpc_threshold;
         
-        hls_dpc.process(dpc_input_stream, dpc_output_stream, dpc_regs);
+        hls_dpc.Process(dpc_input_stream, dpc_output_stream, dpc_regs);
         dpc_result = stream_to_vector(dpc_output_stream);
         write_vector_to_file(config.dpc_output_file, dpc_result);
         cout << "HLS DPC result saved to: " << config.dpc_output_file << endl;
