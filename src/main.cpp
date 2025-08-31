@@ -6,6 +6,7 @@
 #include "hls_dpc.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <hls_stream.h>
 #include <algorithm>
@@ -14,7 +15,7 @@
 using json = nlohmann::json;
 using namespace std;
 
-// 工具函数：从txt文件读取数据到vector
+// 工具函数：从txt文件读取数据到vector（忽略坐标标签）
 vector<uint16_t> read_data_to_vector(const string& filename) {
     ifstream input_file(filename);
     vector<uint16_t> data;
@@ -24,27 +25,59 @@ vector<uint16_t> read_data_to_vector(const string& filename) {
         return data;
     }
     
-    int value;
-    while (input_file >> value) {
-        data.push_back(static_cast<uint16_t>(value));
+    string line;
+    while (getline(input_file, line)) {
+        // 跳过空行
+        if (line.empty()) continue;
+        
+        // 查找注释符号#，如果存在则截取前面的部分
+        size_t comment_pos = line.find('#');
+        if (comment_pos != string::npos) {
+            line = line.substr(0, comment_pos);
+        }
+        
+        // 去除前后空格
+        line.erase(0, line.find_first_not_of(" \t"));
+        line.erase(line.find_last_not_of(" \t") + 1);
+        
+        // 如果处理后为空行，跳过
+        if (line.empty()) continue;
+        
+        // 解析数值（支持空格分隔的多通道数据）
+        istringstream iss(line);
+        int value;
+        while (iss >> value) {
+            data.push_back(static_cast<uint16_t>(value));
+        }
     }
+    
     input_file.close();
     return data;
 }
 
-// 工具函数：从vector写入数据到txt文件
-bool write_vector_to_file(const string& filename, const vector<uint16_t>& data) {
+// 工具函数：从vector写入数据到txt文件（带坐标信息）
+bool write_vector_to_file(const string& filename, const vector<uint16_t>& data, int width, int height) {
     ofstream output_file(filename);
     if (!output_file) {
         cerr << "Cannot open output file: " << filename << endl;
         return false;
     }
     
-    for (const auto& value : data) {
-        output_file << static_cast<int>(value) << "\n";
+    // 计算每行的像素数，如果未提供宽高，则默认单行
+    int pixels_per_row = (width > 0 && height > 0) ? width : data.size();
+    
+    for (size_t i = 0; i < data.size(); ++i) {
+        int row = i / pixels_per_row;
+        int col = i % pixels_per_row;
+        output_file << static_cast<int>(data[i]) << "  # (" << row << "," << col << ")\n";
     }
     output_file.close();
     return true;
+}
+
+// 重载函数：兼容旧的调用方式（不带宽高参数）
+bool write_vector_to_file(const string& filename, const vector<uint16_t>& data) {
+    return write_vector_to_file(filename, data, 0, 0);
 }
 
 // 工具函数：比较两个vector是否一致

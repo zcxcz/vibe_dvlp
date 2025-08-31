@@ -38,7 +38,8 @@ build_hls_top() {
     $CXX $CXXFLAGS $HLS_INC $HLS_TOP_SRC -o $HLS_TOP_EXE
     if [ $? -ne 0 ]; then
         echo "Failed to build HLS top module"
-        return 1
+        # return 1
+        exit 1
     fi
     echo "HLS top module built successfully"
     return 0
@@ -213,6 +214,16 @@ main() {
             ;;
         run_all)
             run_alg_top && run_hls_top
+            ;;
+        hls)
+            clean
+            build_hls_top
+            run_hls_top
+            ;;
+        alg)
+            clean
+            build_alg_top
+            run_alg_top
             ;;
         all)
             clean

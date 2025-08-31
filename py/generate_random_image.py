@@ -48,7 +48,7 @@ def generate_random_image(width, height, image_format='RGB', bit_depth=8):
 
 def save_image(image_data, output_path, bit_depth=8):
     """
-    Save image to file in specified format
+    Save image to file in specified format with coordinates
     
     Args:
         image_data (np.ndarray): Image data
@@ -58,18 +58,20 @@ def save_image(image_data, output_path, bit_depth=8):
     with open(output_path, 'w') as f:
         # Check if it's single channel
         if len(image_data.shape) == 2:
-            # Single channel, one pixel data per line
-            for row in image_data:
-                for pixel in row:
-                    f.write(f"{pixel}\n")
+            # Single channel, include coordinates for better readability
+            height, width = image_data.shape
+            for h in range(height):
+                for w in range(width):
+                    pixel = image_data[h, w]
+                    f.write(f"{pixel}  # ({h},{w})\n")
         else:
-            # Multi-channel, each channel's data is placed in a line, separated by spaces
+            # Multi-channel, include coordinates for better readability
             height, width, channels = image_data.shape
             for h in range(height):
                 for w in range(width):
-                    # Write all channel values of current pixel
+                    # Write all channel values of current pixel with coordinates
                     pixel_values = ' '.join(str(image_data[h, w, c]) for c in range(channels))
-                    f.write(f"{pixel_values}\n")
+                    f.write(f"{pixel_values}  # ({h},{w})\n")
     
     print(f"Image saved to: {output_path}")
 
