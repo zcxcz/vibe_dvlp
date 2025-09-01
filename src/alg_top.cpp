@@ -208,9 +208,11 @@ int main(int argc, char* argv[]) {
             config.crop_enable
         );
         write_vector_to_file(config.crop_output_file, crop_result);
-        cout << "Crop result saved to: " << config.crop_output_file << endl;
+        cout << "Crop enabled, result saved to: " << config.crop_output_file << endl;
     } else {
         crop_result = input_image;
+        write_vector_to_file(config.crop_output_file, crop_result);
+        cout << "Crop disabled, result saved to: " << config.crop_output_file << endl;
     }
     
     vector<uint16_t> dpc_result;
@@ -226,7 +228,11 @@ int main(int argc, char* argv[]) {
             config.dpc_threshold
         );
         write_vector_to_file(config.dpc_output_file, dpc_result);
-        cout << "DPC result saved to: " << config.dpc_output_file << endl;
+        cout << "DPC enabled, result saved to: " << config.dpc_output_file << endl;
+    } else {
+        dpc_result = crop_result;
+        write_vector_to_file(config.dpc_output_file, dpc_result);
+        cout << "DPC disabled, result saved to: " << config.dpc_output_file << endl;
     }
     
     cout << "Algorithm top module completed successfully" << endl;
