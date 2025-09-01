@@ -43,7 +43,7 @@ vector<uint16_t> read_data_to_vector(const string& filename) {
         // 解析数值（支持空格分隔的多通道数据）
         istringstream iss(line);
         int value;
-        while (iss >> value) {
+        while (iss >> hex >> value) {
             data.push_back(static_cast<uint16_t>(value));
         }
     }
@@ -54,29 +54,6 @@ vector<uint16_t> read_data_to_vector(const string& filename) {
 
 // 工具函数：从vector写入数据到txt文件（带坐标信息）
 bool write_vector_to_file(const string& filename, const vector<uint16_t>& data, int width, int height) {
-    // 检查文件是否存在
-    bool file_exists = (access(filename.c_str(), F_OK) == 0);
-    
-    if (file_exists) {
-        cout << "Output file exists: " << filename << ", trying to open..." << endl;
-    } else {
-        cout << "Output file does not exist: " << filename << ", preparing to create..." << endl;
-        
-        // 确保目录存在
-        string dir = ".";
-        size_t last_slash = filename.find_last_of("/");
-        if (last_slash != string::npos) {
-            dir = filename.substr(0, last_slash);
-            cout << "Creating directory path: " << dir << endl;
-            
-            // 创建目录（如果不存在）
-            #ifdef _WIN32
-                system( ("mkdir " + dir).c_str() );
-            #else
-                system( ("mkdir -p " + dir).c_str() );
-            #endif
-        }
-    }
     
     // 打开文件，确保使用正确的模式创建文件
     ofstream output_file(filename, ios::out | ios::trunc);
@@ -94,7 +71,7 @@ bool write_vector_to_file(const string& filename, const vector<uint16_t>& data, 
     for (size_t i = 0; i < data.size(); ++i) {
         int row = i / pixels_per_row;
         int col = i % pixels_per_row;
-        output_file << static_cast<int>(data[i]) << "  # (" << row << "," << col << ")\n";
+        output_file << setw(4) << setfill('0') << hex << static_cast<int>(data[i]) << "  # (" << row << "," << col << ")\n";
     }
     
     // 刷新缓冲区并检查写入是否成功
@@ -174,6 +151,19 @@ AlgTopConfig load_config(const string& config_path) {
     return config;
 }
 
+void print_config(const AlgTopConfig& config) {
+    cout << "Algorithm Top Module Configuration:" << endl;
+    cout << "Width: " << config.width << endl;
+    cout << "Height: " << config.height << endl;
+    cout << "Crop Enable: " << (config.crop_enable ? "true" : "false") << endl;
+    cout << "Crop Start X: " << config.crop_start_x << endl;
+    cout << "Crop Start Y: " << config.crop_start_y << endl;
+    cout << "Crop End X: " << config.crop_end_x << endl;
+    cout << "Crop End Y: " << config.crop_end_y << endl;
+    cout << "DPC Enable: " << (config.dpc_enable ? "true" : "false") << endl;
+    cout << "DPC Threshold: " << config.dpc_threshold << endl;
+}
+
 int main(int argc, char* argv[]) {
     // 加载配置
     string config_path = "alg_top_config.json";
@@ -181,20 +171,8 @@ int main(int argc, char* argv[]) {
         config_path = argv[1];
     }
     AlgTopConfig config = load_config(config_path);
-    
-    // 打印配置信息
-    cout << "Algorithm Top Module Configuration:" << endl;
-    cout << "Width: " << config.width << endl;
-    cout << "Height: " << config.height << endl;
-    cout << "Crop Enable: " << (config.crop_enable ? "true" : "false") << endl;
-    if (config.crop_enable) {
-        cout << "Crop Region: (" << config.crop_start_x << "," << config.crop_start_y << ") to (" << config.crop_end_x << "," << config.crop_end_y << ")" << endl;
-    }
-    cout << "DPC Enable: " << (config.dpc_enable ? "true" : "false") << endl;
-    if (config.dpc_enable) {
-        cout << "DPC Threshold: " << config.dpc_threshold << endl;
-    }
-    
+    print_config(config);
+
     // 加载或生成输入图像
     vector<uint16_t> input_image;
     if (config.generate_random_image == 1) {
@@ -227,7 +205,7 @@ int main(int argc, char* argv[]) {
             config.width, config.height,
             config.crop_start_x, config.crop_start_y,
             config.crop_end_x, config.crop_end_y,
-            true
+            config.crop_enable
         );
         write_vector_to_file(config.crop_output_file, crop_result);
         cout << "Crop result saved to: " << config.crop_output_file << endl;
@@ -242,8 +220,9 @@ int main(int argc, char* argv[]) {
         int dpc_height = config.crop_enable ? (config.crop_end_y - config.crop_start_y + 1) : config.height;
         dpc_result = AlgDpc::process_image(
             crop_result, 
-            dpc_width, 
+            dpc_width,  
             dpc_height,
+            config.dpc_enable,
             config.dpc_threshold
         );
         write_vector_to_file(config.dpc_output_file, dpc_result);

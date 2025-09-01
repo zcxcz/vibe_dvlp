@@ -21,6 +21,7 @@ public:
     static std::vector<alg_pixel_t> process_image(
         const std::vector<alg_pixel_t>& input_image,
         int width, int height,
+        bool enable,
         int threshold
     );
 };

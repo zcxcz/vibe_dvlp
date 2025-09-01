@@ -174,34 +174,48 @@ void HlsDpc::Process(
             
             // update 3x5 visual domain window
             
-            // previous data update,
-            ap_uint<16> dpc_lbuf_raddr_x[2];
+            // lbuf data read
+            ap_uint<16> dpc_lbuf_raddr_x;
             ap_uint<16> dpc_lbuf_raddr_y[2];
             ap_uint<DATA_WIDTH*2> dpc_lbuf_rdata_r[2];
+            dpc_lbuf_raddr_x = clip(cnt_x>>1, 0, (((regs.image_width+1)>>1)-1));
             for (int y=0; y<2; y++) {
                 if (cnt_x[0]==0) {
-                    dpc_lbuf_raddr_x[y] = clip(cnt_x>>1, 0, (((regs.image_width+1)>>1)-1));
                     dpc_lbuf_raddr_y[y] = clip(cnt_y-4+2*y, 0, regs.image_height-1)%5;
-                    dpc_lbuf_rdata_r[y] = hls_dpc_linebuffer[dpc_lbuf_raddr_y[y]][dpc_lbuf_raddr_x[y]];
-                    if (cnt_x == regs.image_width-1) {
+                    dpc_lbuf_rdata_r[y] = hls_dpc_linebuffer[dpc_lbuf_raddr_y[y]][dpc_lbuf_raddr_x];
+                }
+            }
+            
+            // window data update
+            // last line data update
+            for (int y=0; y<2; y++) {
+                if (cnt_x > regs.image_width-1) {
+                    if (regs.image_width[0]==0) {
                         pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](2*DATA_WIDTH-1, DATA_WIDTH);
                     } else {
                         pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](DATA_WIDTH-1, 0);
                     }
                 } else {
-                    pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](2*DATA_WIDTH-1, DATA_WIDTH);
+                    if (cnt_x[0]==0) {
+                        pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](DATA_WIDTH-1, 0);
+                    } else {
+                        pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](2*DATA_WIDTH-1, DATA_WIDTH);
+                    }
                 }
             }
-            
-            // current data update
-            pixel_window[2][cnt_x%5] = input_pixel_data;
+            // current line data update
+            if ( cnt_y > regs.image_height-1) {
+                pixel_window[2][cnt_x%5] = pixel_window[1][cnt_x%5];
+            } else {
+                pixel_window[2][cnt_x%5] = input_pixel_data;
+            }
             
             #if 1
                 printf("############### pixel_window debug\n");
                 printf("coord = (%4x, %4x)\n", cnt_y.to_int(), cnt_x.to_int());
                 for (int y=0; y<2; y++) {
                     printf("### cnt index = %4x, %4x\n", (cnt_x>>1).to_int(), (((regs.image_width+1)>>1)-1).to_int());
-                    printf("### lbuf index = %4x, %4x\n", dpc_lbuf_raddr_y[y].to_int(), dpc_lbuf_raddr_x[y].to_int());
+                    printf("### lbuf index = %4x, %4x\n", dpc_lbuf_raddr_y[y].to_int(), dpc_lbuf_raddr_x.to_int());
                     printf("### rdata = %4x %4x\n", dpc_lbuf_rdata_r[y].range(2*DATA_WIDTH-1, DATA_WIDTH).to_int(), dpc_lbuf_rdata_r[y].range(DATA_WIDTH-1, 0).to_int());
                 }
                 for (int y=0; y<3; y++) {
@@ -219,12 +233,12 @@ void HlsDpc::Process(
                     }
                 }
             
-                #if 0
-                    cout << "pixel_win_remap debug" << endl;
-                    cout << "(" << cnt_y << ", " << cnt_x << ")" << endl;
-                    cout << pixel_win_remap[0][0] << " " << pixel_win_remap[0][1] << " " << pixel_win_remap[0][2] << endl;
-                    cout << pixel_win_remap[1][0] << " " << pixel_win_remap[1][1] << " " << pixel_win_remap[1][2] << endl;
-                    cout << pixel_win_remap[2][0] << " " << pixel_win_remap[2][1] << " " << pixel_win_remap[2][2] << endl;
+                #if 1
+                    printf("pixel_win_remap debug\n");
+                    printf("coord = (%4x, %4x)\n", cnt_y.to_int(), cnt_x.to_int());
+                    printf("%4x, %4x, %4x\n", pixel_win_remap[0][0].to_int(), pixel_win_remap[0][1].to_int(), pixel_win_remap[0][2].to_int());
+                    printf("%4x, %4x, %4x\n", pixel_win_remap[1][0].to_int(), pixel_win_remap[1][1].to_int(), pixel_win_remap[1][2].to_int());
+                    printf("%4x, %4x, %4x\n", pixel_win_remap[2][0].to_int(), pixel_win_remap[2][1].to_int(), pixel_win_remap[2][2].to_int());
                 #endif
                 
                 // pixel process

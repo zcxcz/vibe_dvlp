@@ -15,7 +15,12 @@ alg_pixel_t get_mirrored_pixel(const std::vector<alg_pixel_t>& img, int width, i
 std::vector<alg_pixel_t> AlgDpc::process_image(
     const std::vector<alg_pixel_t>& input_image,
     int width, int height,
+    bool enable,
     int threshold) {
+        
+    if (!enable) {
+        return input_image;
+    }
     
     // 验证输入数据量与预期是否匹配
     int expected_input_size = width * height;
@@ -53,6 +58,23 @@ std::vector<alg_pixel_t> AlgDpc::process_image(
                 min_neighbor = std::min(min_neighbor, neighbor);
                 max_neighbor = std::max(max_neighbor, neighbor);
             }
+
+            #if 1
+                int32_t p00 = get_mirrored_pixel(input_image, width, height, x-2, y-2);
+                int32_t p01 = get_mirrored_pixel(input_image, width, height, x, y-2);
+                int32_t p02 = get_mirrored_pixel(input_image, width, height, x+2, y-2);
+                int32_t p10 = get_mirrored_pixel(input_image, width, height, x-2, y);
+                int32_t p11 = get_mirrored_pixel(input_image, width, height, x, y);
+                int32_t p12 = get_mirrored_pixel(input_image, width, height, x+2, y);
+                int32_t p20 = get_mirrored_pixel(input_image, width, height, x-2, y+2);
+                int32_t p21 = get_mirrored_pixel(input_image, width, height, x, y+2);
+                int32_t p22 = get_mirrored_pixel(input_image, width, height, x+2, y+2);
+                printf("pixel win remap debug\n");
+                printf("coord = (%4x, %4x)\n", x, y);
+                printf("%4x, %4x, %4x\n", p00, p01, p02);
+                printf("%4x, %4x, %4x\n", p10, p11, p12);
+                printf("%4x, %4x, %4x\n", p20, p21, p22);
+            #endif
 
             bool cond1_met = (p0 < min_neighbor) || (p0 > max_neighbor);
 
