@@ -171,43 +171,54 @@ void HlsDpc::Process(
                 #endif
 
             }
-            
-            // update 3x5 visual domain window
-            
-            // lbuf data read
-            ap_uint<16> dpc_lbuf_raddr_x;
-            ap_uint<16> dpc_lbuf_raddr_y[2];
-            ap_uint<DATA_WIDTH*2> dpc_lbuf_rdata_r[2];
-            dpc_lbuf_raddr_x = clip(cnt_x>>1, 0, (((regs.image_width+1)>>1)-1));
-            for (int y=0; y<2; y++) {
-                if (cnt_x[0]==0) {
-                    dpc_lbuf_raddr_y[y] = clip(cnt_y-4+2*y, 0, regs.image_height-1)%5;
-                    dpc_lbuf_rdata_r[y] = hls_dpc_linebuffer[dpc_lbuf_raddr_y[y]][dpc_lbuf_raddr_x];
+                
+                // update 3x5 visual domain window
+                
+                // last line data index update
+                ap_uint<16> dpc_lbuf_raddr_index_x[9] = {-4, -2, 0, -4, -2, 0, -4, -2, 0};
+                ap_uint<16> dpc_lbuf_raddr_index_y[9] = {-4, -4, -4, -2, -2, -2, 0, 0, 0};
+                ap_uint<16> dpc_lbuf_raddr_index_x_clip[9];
+                ap_uint<16> dpc_lbuf_raddr_index_y_clip[9];
+                for (int y=0; y<9; y++) {
+                    dpc_lbuf_raddr_index_x_clip[y] = clip(dpc_lbuf_raddr_index_x_clip[y]+cnt_y, 0, regs.image_width-1)%5;
+                    dpc_lbuf_raddr_index_y_clip[y] = clip(dpc_lbuf_raddr_index_y_clip[y]+cnt_y, 0, regs.image_height-1)%5;
                 }
-            }
-            
-            // window data update
-            // last line data update
-            for (int y=0; y<2; y++) {
-                if (cnt_x > regs.image_width-1) {
-                    if (regs.image_width[0]==0) {
-                        pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](2*DATA_WIDTH-1, DATA_WIDTH);
-                    } else {
-                        pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](DATA_WIDTH-1, 0);
-                    }
-                } else {
+                ap_uint<DATA_WIDTH*2> dpc_lbuf_rdata_r[3][3];
+                // dpc_lbuf_raddr_x = clip(cnt_x>>1, 0, (((regs.image_width+1)>>1)-1));
+                for (int y=0; y<2; y++) {
                     if (cnt_x[0]==0) {
-                        pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](DATA_WIDTH-1, 0);
+                        dpc_lbuf_raddr_y[y] = (cnt_y-4+2*y)%5;
+                        // dpc_lbuf_raddr_y[y] = clip(cnt_y-4+2*y, 0, regs.image_height-1)%5;
+                        dpc_lbuf_rdata_r[y] = hls_dpc_linebuffer[dpc_lbuf_raddr_y[y]][dpc_lbuf_raddr_x];
+                    }
+                }
+
+                // last line data update
+                for (int y=0; y<2; y++) {
+                    if (cnt_x > regs.image_width-1) {
+                        if (regs.image_width[0]==0) {
+                            pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](2*DATA_WIDTH-1, DATA_WIDTH);
+                        } else {
+                            pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](DATA_WIDTH-1, 0);
+                        }
                     } else {
-                        pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](2*DATA_WIDTH-1, DATA_WIDTH);
+                        if (cnt_x[0]==0) {
+                            pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](DATA_WIDTH-1, 0);
+                        } else {
+                            pixel_window[y][cnt_x%5] = dpc_lbuf_rdata_r[y](2*DATA_WIDTH-1, DATA_WIDTH);
+                        }
                     }
                 }
             }
-            // current line data update
-            if ( cnt_y > regs.image_height-1) {
-                pixel_window[2][cnt_x%5] = pixel_window[1][cnt_x%5];
-            } else {
-                pixel_window[2][cnt_x%5] = input_pixel_data;
+
+            if (cnt_x < regs.image_width && cnt_y <= regs.image_height) {
+                // current line data update
+                if ( cnt_y > regs.image_height-1) {
+                    pixel_window[2][cnt_x%5] = hls_dpc_linebuffer[cnt_x%5];
+                } else {
+                    pixel_window[2][cnt_x%5] = input_pixel_data;
+                }
+            
             }
             
             #if 1

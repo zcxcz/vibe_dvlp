@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
         int dpc_width = config.crop_enable ? (config.crop_end_x - config.crop_start_x + 1) : config.width;
         int dpc_height = config.crop_enable ? (config.crop_end_y - config.crop_start_y + 1) : config.height;
         dpc_result = AlgDpc::process_image(
-            crop_result, 
+            crop_result,
             dpc_width,  
             dpc_height,
             config.dpc_enable,
