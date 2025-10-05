@@ -12,7 +12,8 @@ alg_pixel_t get_mirrored_pixel(const std::vector<alg_pixel_t>& img, int width, i
     return img[y * width + x];
 }
 
-std::vector<alg_pixel_t> AlgDpc::process_image(
+template <typename ALG_INPUT_DATA_TYPE, typename ALG_OUTPUT_DATA_TYPE>
+std::vector<alg_pixel_t> AlgDpc<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE>::process_image(
     const std::vector<alg_pixel_t>& input_image,
     int width, int height,
     bool enable,

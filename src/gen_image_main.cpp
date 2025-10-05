@@ -9,7 +9,7 @@
 #include "json.hpp"
 #include "print_function.h"
 #include "vector_function.h"
-#include "image_info.h"
+#include "parse_json_function.h"
 
 // def
 #define GEN_IMAGE_MAIN_SECTION "[gen_image_main]"
@@ -28,12 +28,17 @@ int main(const int argc, const char *argv[]) {
     
     json data = json::parse(f);
     f.close();
+    main_info(GEN_IMAGE_MAIN_SECTION, "vibe.json configuration file parse follow...");
+    main_info(GEN_IMAGE_MAIN_SECTION, data.dump(2));
     
+    // object loading
+    main_info(GEN_IMAGE_MAIN_SECTION, "object: image_info print follow...");
     ImageSection image_section = data["image_info"].get<ImageSection>();
+    main_info(GEN_IMAGE_MAIN_SECTION, "object: register_info print follow...");
     RegisterSection register_section = data["register_info"].get<RegisterSection>();
-    main_info(GEN_IMAGE_MAIN_SECTION, "object: image_info print follow:");
+    main_info(GEN_IMAGE_MAIN_SECTION, "object: image_info print follow...");
     image_section.print_values();
-    main_info(GEN_IMAGE_MAIN_SECTION, "object: register_info print follow:");
+    main_info(GEN_IMAGE_MAIN_SECTION, "object: register_info print follow...");
     register_section.print_values();
     
     int width = register_section.reg_image_width.reg_initial_value[0];

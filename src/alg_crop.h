@@ -1,26 +1,94 @@
 #ifndef ALG_CROP_H
 #define ALG_CROP_H
 
+// std
 #include <vector>
 #include <cstdint>
-#include <fstream>
 #include <random>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
 
-// 算法模型使用的数据类型
-using alg_pixel_t = uint16_t;
+// tool
+#include "print_function.h"
+#include "parse_json_function.h"
+#include "alg_info.h"
 
+// def
+#define ALG_CROP_SECTION "[AlgCrop]"
+
+
+template <typename ALG_INPUT_DATA_TYPE, typename ALG_OUTPUT_DATA_TYPE>
 class AlgCrop {
 public:
-    // 图像裁剪算法
-    void crop_image(
-        const std::vector<alg_pixel_t>& input_image,
-        std::vector<alg_pixel_t>& output_image,
-        int width, int height,
-        int start_x, int start_y,
-        int end_x, int end_y,
-        bool enable
-    );
-    
+    void run(
+            const std::vector<ALG_INPUT_DATA_TYPE>& input_image,
+            std::vector<ALG_OUTPUT_DATA_TYPE>& output_image,
+            const AlgRegisterSection& alg_register_section
+        ) {
+            
+            if (!alg_register_section.reg_crop_enable) {
+                output_image = input_image;
+                return;
+            }
+            
+            int expected_input_size = alg_register_section.reg_image_width * alg_register_section.reg_image_height;
+            if (input_image.size() != expected_input_size) {
+                main_error(ALG_CROP_SECTION, "Error: Input data size mismatch");
+                return;
+            }
+            
+            if (alg_register_section.reg_crop_start_x < 0 || 
+                alg_register_section.reg_crop_start_y < 0 || 
+                alg_register_section.reg_crop_end_x < 0 || 
+                alg_register_section.reg_crop_end_y < 0) {
+                main_error(ALG_CROP_SECTION, "Error: Negative coordinates are not allowed");
+                return;
+            }
+            
+            if (alg_register_section.reg_crop_start_x > alg_register_section.reg_crop_end_x || 
+                alg_register_section.reg_crop_start_y > alg_register_section.reg_crop_end_y) {
+                main_error(ALG_CROP_SECTION, "Error: Start coordinates must be less than or equal to end coordinates");
+                return;
+            }
+            
+            if (alg_register_section.reg_crop_start_x >= alg_register_section.reg_image_width || 
+                alg_register_section.reg_crop_end_x >= alg_register_section.reg_image_width || 
+                alg_register_section.reg_crop_start_y >= alg_register_section.reg_image_height || 
+                alg_register_section.reg_crop_end_y >= alg_register_section.reg_image_height) {
+                main_error(ALG_CROP_SECTION, "Error: Crop coordinates exceed image dimensions");
+                return;
+            }
+        
+        int crop_width = alg_register_section.reg_crop_end_x - alg_register_section.reg_crop_start_x + 1;
+        int crop_height = alg_register_section.reg_crop_end_y - alg_register_section.reg_crop_start_y + 1;
+        
+        if (crop_width <= 0 || crop_height <= 0) {
+            main_error(ALG_CROP_SECTION, "Error: Invalid crop dimensions");
+            return;
+        }
+            
+        if (crop_width > alg_register_section.reg_image_width || crop_height > alg_register_section.reg_image_height) {
+            main_error(ALG_CROP_SECTION, "Error: Crop dimensions exceed image dimensions");
+            return;
+        }
+        
+        std::vector<ALG_OUTPUT_DATA_TYPE> cropped_image(crop_width * crop_height);
+        
+        for (int y = alg_register_section.reg_crop_start_y; y <= alg_register_section.reg_crop_end_y; ++y) {
+            for (int x = alg_register_section.reg_crop_start_x; x <= alg_register_section.reg_crop_end_x; ++x) {
+                int src_idx = y * alg_register_section.reg_image_width + x;
+                int dst_idx = (y - alg_register_section.reg_crop_start_y) * crop_width + (x - alg_register_section.reg_crop_start_x);
+                if (src_idx < input_image.size()) {
+                    cropped_image[dst_idx] = input_image[src_idx];
+                }
+            }
+        }
+        
+        output_image = cropped_image;
+
+    }
+
 };
 
 #endif // ALG_CROP_H

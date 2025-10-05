@@ -2,6 +2,7 @@
 #define IMAGE_INFO_H
 
 #include <string>
+#include <iostream>
 #include "json.hpp"
 
 using json = nlohmann::json;
@@ -25,17 +26,17 @@ struct ImageSection {
 };
 
 struct OutputSection {
-    string alg_crop_output;
-    string alg_dpc_output;
-    string hls_crop_output;
-    string hls_dpc_output;
+    string alg_crop_output_path;
+    string alg_dpc_output_path;
+    string hls_crop_output_path;
+    string hls_dpc_output_path;
     
     void print_values() const {
         cout << "OutputSection:" << endl;
-        cout << "  alg_crop_output: " << alg_crop_output << endl;
-        cout << "  alg_dpc_output: " << alg_dpc_output << endl;
-        cout << "  hls_crop_output: " << hls_crop_output << endl;
-        cout << "  hls_dpc_output: " << hls_dpc_output << endl;
+        cout << "  alg_crop_output_path: " << alg_crop_output_path << endl;
+        cout << "  alg_dpc_output_path: " << alg_dpc_output_path << endl;
+        cout << "  hls_crop_output_path: " << hls_crop_output_path << endl;
+        cout << "  hls_dpc_output_path: " << hls_dpc_output_path << endl;
     }
 };
 
@@ -75,7 +76,6 @@ struct RegisterSection {
     }
 };
 
-// JSON解析函数 - 简化版本
 inline void from_json(const json& j, ImageSection& info) {
     info.image_path = j["image_path"];
     info.image_format = j["image_format"];
@@ -92,10 +92,10 @@ inline void from_json(const json& j, RegisterSection::RegisterInfo& reg) {
 }
 
 inline void from_json(const json& j, OutputSection& info) {
-    info.alg_crop_output = j["alg_crop_output"];
-    info.alg_dpc_output = j["alg_dpc_output"];
-    info.hls_crop_output = j["hls_crop_output"];
-    info.hls_dpc_output = j["hls_dpc_output"];
+    info.alg_crop_output_path = j["alg_crop_output_path"];
+    info.alg_dpc_output_path = j["alg_dpc_output_path"];
+    info.hls_crop_output_path = j["hls_crop_output_path"];
+    info.hls_dpc_output_path = j["hls_dpc_output_path"];
 }
 
 inline void from_json(const json& j, RegisterSection& info) {

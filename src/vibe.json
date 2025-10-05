@@ -1,16 +1,16 @@
 {
   "image_info": {
-    "image_path": "data/src_image.txt",
     "image_format": "BAYER",
     "image_data_bitwidth": 8,
     "generate_random_image": 1,
+    "image_path": "data/src_image.txt",
     "random_image_path": "data/src_image_random_generate.txt"
   },
   "output_info": {
-    "alg_crop_output": "data/alg_crop_output.txt",
-    "alg_dpc_output": "data/alg_dpc_output.txt",
-    "hls_crop_output": "data/hls_crop_output.txt",
-    "hls_dpc_output": "data/hls_dpc_output.txt"
+    "alg_crop_output_path": "data/alg_crop_output_path.txt",
+    "alg_dpc_output_path": "data/alg_dpc_output_path.txt",
+    "hls_crop_output_path": "data/hls_crop_output_path.txt",
+    "hls_dpc_output_path": "data/hls_dpc_output_path.txt"
   },
   "register_info": {
     "reg_image_width": {
@@ -72,7 +72,7 @@
     "reg_crop_enable": {
       "reg_bit_width": 1,
       "reg_initial_value": [
-        0
+        1
       ],
       "reg_value_min": 0,
       "reg_value_max": 1
