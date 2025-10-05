@@ -18,11 +18,11 @@ using json = nlohmann::json;
 using namespace std;
 
 // def
-#define ALG_MAIN_SECTION "AlgMain"
+#define ALG_MAIN_SECTION "[AlgMain]"
 
 int main(const int argc, const char *argv[]) {
     // json config loading
-    string config_path = "../src/vibe.json";
+    string config_path = "/home/sheldon/hls_project/vibe_crop/src/vibe.json";
     ifstream f(config_path);
     if (!f.is_open()) {
         main_error(ALG_MAIN_SECTION, "Cannot open vibe.json configuration file");
@@ -36,9 +36,9 @@ int main(const int argc, const char *argv[]) {
     
     // object loading
     main_info(ALG_MAIN_SECTION, "object: image_section print follow:");
-    ImageSection image_section = data["image_section"].get<ImageSection>();
+    ImageSection image_section = data["image_info"].get<ImageSection>();
     main_info(ALG_MAIN_SECTION, "object: register_section print follow:");
-    RegisterSection register_section = data["register_section"].get<RegisterSection>();
+    RegisterSection register_section = data["register_info"].get<RegisterSection>();
     main_info(ALG_MAIN_SECTION, "object: output_section print follow:");
     OutputSection output_section = data["output_info"].get<OutputSection>();
 

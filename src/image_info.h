@@ -25,17 +25,17 @@ struct ImageSection {
 };
 
 struct OutputSection {
-    string alg_crop_output_file;
-    string alg_dpc_output_file;
-    string hls_crop_output_file;
-    string hls_dpc_output_file;
+    string alg_crop_output;
+    string alg_dpc_output;
+    string hls_crop_output;
+    string hls_dpc_output;
     
     void print_values() const {
         cout << "OutputSection:" << endl;
-        cout << "  alg_crop_output_file: " << alg_crop_output_file << endl;
-        cout << "  alg_dpc_output_file: " << alg_dpc_output_file << endl;
-        cout << "  hls_crop_output_file: " << hls_crop_output_file << endl;
-        cout << "  hls_dpc_output_file: " << hls_dpc_output_file << endl;
+        cout << "  alg_crop_output: " << alg_crop_output << endl;
+        cout << "  alg_dpc_output: " << alg_dpc_output << endl;
+        cout << "  hls_crop_output: " << hls_crop_output << endl;
+        cout << "  hls_dpc_output: " << hls_dpc_output << endl;
     }
 };
 
@@ -76,7 +76,7 @@ struct RegisterSection {
 };
 
 // JSON解析函数 - 简化版本
-void from_json(const json& j, ImageSection& info) {
+inline void from_json(const json& j, ImageSection& info) {
     info.image_path = j["image_path"];
     info.image_format = j["image_format"];
     info.image_data_bitwidth = j["image_data_bitwidth"];
@@ -84,21 +84,21 @@ void from_json(const json& j, ImageSection& info) {
     info.random_image_path = j["random_image_path"];
 }
 
-void from_json(const json& j, RegisterSection::RegisterInfo& reg) {
+inline void from_json(const json& j, RegisterSection::RegisterInfo& reg) {
     reg.reg_bit_width = j["reg_bit_width"];
     reg.reg_initial_value = j["reg_initial_value"].get<std::vector<int>>();
     reg.reg_value_min = j["reg_value_min"];
     reg.reg_value_max = j["reg_value_max"];
 }
 
-void from_json(const json& j, OutputSection& info) {
-    info.alg_crop_output_file = j["alg_crop_output_file"];
-    info.alg_dpc_output_file = j["alg_dpc_output_file"];
-    info.hls_crop_output_file = j["hls_crop_output_file"];
-    info.hls_dpc_output_file = j["hls_dpc_output_file"];
+inline void from_json(const json& j, OutputSection& info) {
+    info.alg_crop_output = j["alg_crop_output"];
+    info.alg_dpc_output = j["alg_dpc_output"];
+    info.hls_crop_output = j["hls_crop_output"];
+    info.hls_dpc_output = j["hls_dpc_output"];
 }
 
-void from_json(const json& j, RegisterSection& info) {
+inline void from_json(const json& j, RegisterSection& info) {
     from_json(j["reg_image_width"], info.reg_image_width);
     from_json(j["reg_image_height"], info.reg_image_height);
     from_json(j["reg_smooth_filter_enable"], info.reg_smooth_filter_enable);

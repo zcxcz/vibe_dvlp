@@ -48,6 +48,8 @@ struct AlgOutputSection {
     // image info
     string crop_output_file;
     string dpc_output_file;
+    string hls_crop_output_file;
+    string hls_dpc_output_file;
 };
 
 class AlgTop {

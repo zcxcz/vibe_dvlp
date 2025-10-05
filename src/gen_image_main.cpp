@@ -19,20 +19,10 @@ using json = nlohmann::json;
 using namespace std;
 
 int main(const int argc, const char *argv[]) {
-    string config_path = "../src/vibe.json";
+    string config_path = "/home/sheldon/hls_project/vibe_crop/src/vibe.json";
     ifstream f(config_path);
     if (!f.is_open()) {
-        // 尝试当前目录
-        config_path = "src/vibe.json";
-        f.open(config_path);
-        if (!f.is_open()) {
-            // 尝试绝对路径
-            config_path = "/home/sheldon/hls_project/vibe_crop/src/vibe.json";
-            f.open(config_path);
-            if (!f.is_open()) {
-                main_error(GEN_IMAGE_MAIN_SECTION, "Cannot open vibe.json configuration file");
-            }
-        }
+        main_error(GEN_IMAGE_MAIN_SECTION, "Cannot open vibe.json configuration file");
     }
     main_info(GEN_IMAGE_MAIN_SECTION, "vibe.json configuration file path: " + config_path);
     

@@ -8,7 +8,7 @@ CXXFLAGS="-std=c++11 -Wall -Wextra -O2"
 INCLUDES="-I./src"
 
 # 源文件
-SRCS="src/alg_main.cpp src/alg_info.cpp src/alg_crop.cpp src/alg_dpc.cpp src/alg_top.cpp src/print_function.cpp src/vector_function.cpp"
+SRCS="src/alg_main.cpp src/alg_top.cpp src/print_function.cpp src/vector_function.cpp"
 
 # 输出文件
 OUTPUT="alg_main"
