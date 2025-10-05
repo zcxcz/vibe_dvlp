@@ -16,9 +16,10 @@ using json = nlohmann::json;
 using namespace std;
 
 // 工具函数：从txt文件读取数据到vector（忽略坐标标签）
-vector<uint16_t> read_data_to_vector(const string& filename) {
+template <typename T>
+vector<T> vector_read_from_file(const string& filename) {
     ifstream input_file(filename);
-    vector<uint16_t> data;
+    vector<T> data;
     
     if (!input_file) {
         cerr << "Cannot open input file: " << filename << endl;
@@ -56,7 +57,7 @@ vector<uint16_t> read_data_to_vector(const string& filename) {
 }
 
 // 工具函数：从vector写入数据到txt文件（带坐标信息）
-bool write_vector_to_file(const string& filename, const vector<uint16_t>& data, int width, int height) {
+bool vector_write_to_file(const string& filename, const vector<uint16_t>& data, int width, int height) {
     ofstream output_file(filename);
     if (!output_file) {
         cerr << "Cannot open output file: " << filename << endl;
@@ -75,13 +76,9 @@ bool write_vector_to_file(const string& filename, const vector<uint16_t>& data, 
     return true;
 }
 
-// 重载函数：兼容旧的调用方式（不带宽高参数）
-bool write_vector_to_file(const string& filename, const vector<uint16_t>& data) {
-    return write_vector_to_file(filename, data, 0, 0);
-}
-
-// 工具函数：比较两个vector是否一致
-bool compare_vectors(const vector<uint16_t>& vec1, const vector<uint16_t>& vec2) {
+// 工具函数：比较两个vector是否一致（模板化）
+template <typename T, typename U>
+bool vector_compare(const vector<T>& vec1, const vector<U>& vec2) {
     if (vec1.size() != vec2.size()) {
         cerr << "Vector sizes differ: " << vec1.size() << " vs " << vec2.size() << endl;
         return false;
@@ -97,15 +94,16 @@ bool compare_vectors(const vector<uint16_t>& vec1, const vector<uint16_t>& vec2)
     return true;
 }
 
-// 工具函数：将vector数据转换为HLS流
-void vector_to_stream(const vector<uint16_t>& data, hls::stream<axis_pixel_t>& stream) {
+// 工具函数：将vector数据转换为HLS流（模板化）
+template <typename T>
+void vector_write_to_stream(const vector<T>& data, hls::stream<axis_pixel_t>& stream) {
     for (size_t i = 0; i < data.size(); ++i) {
         axis_pixel_t data_pkt;
         if (data[i] >= 256) {
             std::cerr << "Warning: Value " << data[i] << " exceeds 8-bit range, truncating" << std::endl;
             data_pkt.data = 255; // 8-bit max
         } else {
-            data_pkt.data = static_cast<ap_uint<8>>(data[i]);
+            data_pkt.data = static_cast<T>(data[i]);
         }
         data_pkt.last = (i == data.size() - 1) ? 1 : 0;
         stream.write(data_pkt);
@@ -113,7 +111,7 @@ void vector_to_stream(const vector<uint16_t>& data, hls::stream<axis_pixel_t>& s
 }
 
 // 工具函数：将HLS流转换为vector
-vector<uint16_t> stream_to_vector(hls::stream<axis_pixel_t>& stream) {
+vector<uint16_t> vector_read_from_stream(hls::stream<axis_pixel_t>& stream) {
     vector<uint16_t> data;
     while (!stream.empty()) {
         auto data_pkt = stream.read();
@@ -122,30 +120,26 @@ vector<uint16_t> stream_to_vector(hls::stream<axis_pixel_t>& stream) {
     return data;
 }
 
+void main_info(const string& msg) {
+    cout << "MAIN, info: " << msg << endl;
+}
+void main_error(const string& msg) {
+    cerr << "MAIN, Error: " << msg << endl;
+    exit(1);
+}
 
 int main(const int argc, const char *argv[]) {
     try {
         // 读取JSON配置 - 兼容不同构建目录
-    string config_path = "./vibe.json";
+    string config_path = "../src/vibe.json";
     ifstream f(config_path);
     if (!f.is_open()) {
-        // 尝试data子目录路径
-        config_path = "./data/vibe.json";
-        f.open(config_path);
+        main_error("Cannot open vibe.json configuration file");
     }
-    if (!f.is_open()) {
-        // 尝试上级目录的data子目录路径
-        config_path = "../data/vibe.json";
-        f.open(config_path);
-    }
-    if (!f.is_open()) {
-        cerr << "Error: Cannot open vibe.json configuration file" << endl;
-        return 1;
-    }
-
-    cout << "vibe.json configuration file path: " << config_path << endl;
+    main_info("vibe.json configuration file path: " + config_path);
     
         json data = json::parse(f);
+        f.close();
         
         ImageInfo img_info = data["image_info"].get<ImageInfo>();
         RegisterInfo reg_info = data["register_info"].get<RegisterInfo>();
@@ -180,7 +174,7 @@ int main(const int argc, const char *argv[]) {
             bool image_saved = false;
             for (const auto& path : save_paths) {
                 cout << "Trying to save random image: " << path << endl;
-                if (write_vector_to_file(path, input_image)) {
+                if (vector_write_to_file(path, input_image)) {
                     cout << "Successfully saved random image: " << path << endl;
                     image_saved = true;
                     break;
@@ -201,7 +195,7 @@ int main(const int argc, const char *argv[]) {
             bool image_load = false;
             for (const auto& path : image_paths) {
                 cout << "Trying to load random image: " << path << endl;
-                input_image = read_data_to_vector(path);
+                input_image = vector_read_from_file(path);
                 if (!input_image.empty()) {
                     cout << "Successfully load image: " << path << endl;
                     image_load = true;
@@ -224,7 +218,7 @@ int main(const int argc, const char *argv[]) {
             bool image_load = false;
             for (const auto& path : image_paths) {
                 cout << "Trying to load image: " << path << endl;
-                input_image = read_data_to_vector(path);
+                input_image = vector_read_from_file(path);
                 if (!input_image.empty()) {
                     cout << "Successfully load image: " << path << endl;
                     image_load = true;
@@ -264,7 +258,7 @@ int main(const int argc, const char *argv[]) {
         bool alg_data_store = false;
         for (const auto& path : data_paths) {
         // 尝试创建data子文件夹下的文件
-            if (write_vector_to_file(path, alg_result)) {
+            if (vector_write_to_file(path, alg_result)) {
                 alg_output_file = path;
                 cout << "Algorithm model result written to " << alg_output_file << endl;
                 alg_data_store = true;
@@ -298,7 +292,7 @@ int main(const int argc, const char *argv[]) {
         };
         bool dpc_data_store = false;
         for (const auto& path : dpc_data_paths) {
-            if (write_vector_to_file(path, dpc_result)) {
+            if (vector_write_to_file(path, dpc_result)) {
                 dpc_output_file = path;
                 cout << "Algorithm DPC model result written to " << dpc_output_file << endl;
                 dpc_data_store = true;
@@ -342,15 +336,15 @@ int main(const int argc, const char *argv[]) {
         hls::stream<axis_pixel_t> crop_output_stream;
         
         // 将输入数据转换为HLS流
-        vector_to_stream(input_image, input_stream);
+        vector_write_to_stream(input_image, input_stream);
         
         // 运行HLS裁剪模型
         crop_hls(input_stream, crop_output_stream, crop_regs);
 
         // 将裁剪后的流转换为vector，再转换为DPC输入流
-        vector<uint16_t> crop_result = stream_to_vector(crop_output_stream);
+        vector<uint16_t> crop_result = vector_read_from_stream(crop_output_stream);
         hls::stream<axis_pixel_t> dpc_input_stream;
-        vector_to_stream(crop_result, dpc_input_stream);
+        vector_write_to_stream(crop_result, dpc_input_stream);
 
         // 准备HLS DPC寄存器
         HlsDpcRegisterInfo dpc_regs;
@@ -366,7 +360,7 @@ int main(const int argc, const char *argv[]) {
         dpc_hls(dpc_input_stream, dpc_output_stream, dpc_regs);
 
         // 将HLS DPC输出转换为vector
-        vector<uint16_t> hls_result = stream_to_vector(dpc_output_stream);
+        vector<uint16_t> hls_result = vector_read_from_stream(dpc_output_stream);
         
         // 将HLS模型的结果写入文件 - 优先尝试data子文件夹，不存在则当前目录
         string hls_output_file;
@@ -378,9 +372,10 @@ int main(const int argc, const char *argv[]) {
         bool hls_data_store = false;
         // 尝试创建data子文件夹下的文件
         for (const auto& path : hls_data_paths) {
-            if (write_vector_to_file(path, hls_result)) {
+            if (vector_write_to_file(path, hls_result)) {
                 hls_output_file = path;
                 cout << "HLS model result written to " << hls_output_file << endl;
+                hls_data_store = true;
                 break;
             }
         }
@@ -388,7 +383,7 @@ int main(const int argc, const char *argv[]) {
         
         // 交叉验证：比较算法模型和HLS模型结果
         cout << "Cross-validating algorithm and HLS models..." << endl;
-        if (compare_vectors(alg_result, hls_result)) {
+        if (vector_compare(alg_result, hls_result)) {
             cout << "SUCCESS: Algorithm and HLS models produce identical results!" << endl;
         } else {
             cerr << "ERROR: Algorithm and HLS models produce different results!" << endl;
