@@ -34,21 +34,23 @@ public:
             
             int expected_input_size = alg_register_section.reg_image_width * alg_register_section.reg_image_height;
             if (input_image.size() != expected_input_size) {
-                main_error(ALG_CROP_SECTION, "Error: Input data size mismatch");
+                MAIN_ERROR_1("Error: Input data size mismatch");
                 return;
             }
+
+            assert(input_image.size() == expected_input_size);
             
             if (alg_register_section.reg_crop_start_x < 0 || 
                 alg_register_section.reg_crop_start_y < 0 || 
                 alg_register_section.reg_crop_end_x < 0 || 
                 alg_register_section.reg_crop_end_y < 0) {
-                main_error(ALG_CROP_SECTION, "Error: Negative coordinates are not allowed");
+                MAIN_ERROR_1("Error: Negative coordinates are not allowed");
                 return;
             }
             
             if (alg_register_section.reg_crop_start_x > alg_register_section.reg_crop_end_x || 
                 alg_register_section.reg_crop_start_y > alg_register_section.reg_crop_end_y) {
-                main_error(ALG_CROP_SECTION, "Error: Start coordinates must be less than or equal to end coordinates");
+                MAIN_ERROR_1("Error: Start coordinates must be less than or equal to end coordinates");
                 return;
             }
             
@@ -56,7 +58,7 @@ public:
                 alg_register_section.reg_crop_end_x >= alg_register_section.reg_image_width || 
                 alg_register_section.reg_crop_start_y >= alg_register_section.reg_image_height || 
                 alg_register_section.reg_crop_end_y >= alg_register_section.reg_image_height) {
-                main_error(ALG_CROP_SECTION, "Error: Crop coordinates exceed image dimensions");
+                MAIN_ERROR_1("Error: Crop coordinates exceed image dimensions");
                 return;
             }
         
@@ -64,12 +66,12 @@ public:
         int crop_height = alg_register_section.reg_crop_end_y - alg_register_section.reg_crop_start_y + 1;
         
         if (crop_width <= 0 || crop_height <= 0) {
-            main_error(ALG_CROP_SECTION, "Error: Invalid crop dimensions");
+            MAIN_ERROR_1("Error: Invalid crop dimensions");
             return;
         }
             
         if (crop_width > alg_register_section.reg_image_width || crop_height > alg_register_section.reg_image_height) {
-            main_error(ALG_CROP_SECTION, "Error: Crop dimensions exceed image dimensions");
+            MAIN_ERROR_1("Error: Crop dimensions exceed image dimensions");
             return;
         }
         

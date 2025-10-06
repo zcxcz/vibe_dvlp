@@ -5,9 +5,9 @@
 using namespace std;
 
 void main_info(const string& section, const string& msg) {
-    cout << section << " info: " << msg << endl;
+    cout << "[" << section << "] Info: " << msg << endl;
 }
 void main_error(const string& section, const string& msg) {
-    cerr << section << " Error: " << msg << endl;
+    cerr << "[" << section << "] Error: " << msg << endl;
     exit(1);
 }

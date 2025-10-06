@@ -23,7 +23,7 @@ using json = nlohmann::json;
 using namespace std;
 
 // def
-#define ALG_TOP_SECTION "[AlgTop]"
+#define ALG_TOP_SECTION "AlgTop"
 
 
 template <typename ALG_INPUT_DATA_TYPE, typename ALG_OUTPUT_DATA_TYPE>
@@ -49,7 +49,7 @@ public:
 
     void loadRegisterSection(const RegisterSection& register_section) {
         // register info
-        main_info(ALG_TOP_SECTION, "Register Section loading...");
+        MAIN_INFO_1("Register Section loading...");
         alg_register_section.reg_image_width = register_section.reg_image_width.reg_initial_value[0];
         alg_register_section.reg_image_height = register_section.reg_image_height.reg_initial_value[0];
         alg_register_section.reg_crop_start_x = register_section.reg_crop_start_x.reg_initial_value[0];
@@ -64,7 +64,7 @@ public:
 
     void loadImageSection(const ImageSection& image_section) {
         // image info
-        main_info(ALG_TOP_SECTION, "Image Section loading...");
+        MAIN_INFO_1("Image Section loading...");
         alg_image_section.image_path = image_section.image_path;
         alg_image_section.random_image_path = image_section.random_image_path;
         alg_image_section.generate_random_image = image_section.generate_random_image;
@@ -72,7 +72,7 @@ public:
 
     void loadOutputSection(const OutputSection& output_section) {
         // image info
-        main_info(ALG_TOP_SECTION, "Output Section loading...");
+        MAIN_INFO_1("Output Section loading...");
         alg_output_section.alg_crop_output_path = output_section.alg_crop_output_path;
         alg_output_section.alg_dpc_output_path = output_section.alg_dpc_output_path;
         alg_output_section.hls_crop_output_path = output_section.hls_crop_output_path;
@@ -87,7 +87,7 @@ public:
 
     
     void loadImage() {
-        main_info(ALG_TOP_SECTION, "Loading source image...");
+        MAIN_INFO_1("Loading source image...");
         if (alg_image_section.generate_random_image) {
             alg_crop_input_image = vector_read_from_file<ALG_INPUT_DATA_TYPE>(alg_image_section.random_image_path);
         } else {
@@ -97,7 +97,7 @@ public:
 
 
     void printRegisterSection() {
-        main_info(ALG_TOP_SECTION, "Register Section Configuration");
+        MAIN_INFO_1("Register Section Configuration");
         cout << "Width: " << alg_register_section.reg_image_width << endl;
         cout << "Height: " << alg_register_section.reg_image_height << endl;
         cout << "Crop Enable: " << (alg_register_section.reg_crop_enable ? "true" : "false") << endl;
@@ -110,14 +110,14 @@ public:
     }
 
     void printImageSection() {
-        main_info(ALG_TOP_SECTION, "Image Section Configuration");
+        MAIN_INFO_1("Image Section Configuration");
         cout << "Input File: " << alg_image_section.image_path << endl;
         cout << "Random Image Path: " << alg_image_section.random_image_path << endl;
         cout << "Generate Random Image: " << (alg_image_section.generate_random_image ? "true" : "false") << endl;
     }
 
     void printOutputSection() {
-        main_info(ALG_TOP_SECTION, "Output Section Configuration");
+        MAIN_INFO_1("Output Section Configuration");
         cout << "Crop Output File: " << alg_output_section.alg_crop_output_path << endl;
         cout << "DPC Output File: " << alg_output_section.alg_dpc_output_path << endl;
         cout << "HLS Crop Output File: " << alg_output_section.hls_crop_output_path << endl;
@@ -132,19 +132,19 @@ public:
 
 
     void run(const vector<ALG_INPUT_DATA_TYPE>& input_image, vector<ALG_OUTPUT_DATA_TYPE>& output_image) {
-        main_info(ALG_TOP_SECTION, "AlgTop run...");
+        MAIN_INFO_1("AlgTop run...");
         
+        // src image loading...
         loadImage();
         
-        if (alg_register_section.reg_crop_enable) {
-            main_info(ALG_TOP_SECTION, "Running crop algorithm...");
-            alg_crop.run(alg_crop_input_image, alg_crop_output_image, alg_register_section);
-            main_info(ALG_TOP_SECTION, "Saving crop output to: " + alg_output_section.alg_crop_output_path);
-            vector_write_to_file<ALG_OUTPUT_DATA_TYPE>(alg_output_section.alg_crop_output_path, alg_crop_output_image, 
+        // alg crop running...
+        MAIN_INFO_1("Running crop algorithm...");
+        alg_crop.run(alg_crop_input_image, alg_crop_output_image, alg_register_section);
+        MAIN_INFO_1("Saving crop output to: " + alg_output_section.alg_crop_output_path);
+        vector_write_to_file<ALG_OUTPUT_DATA_TYPE>(alg_output_section.alg_crop_output_path, alg_crop_output_image, 
                                                         alg_register_section.reg_image_width, alg_register_section.reg_image_height);
-        }
         
-        main_info(ALG_TOP_SECTION, "Algorithm execution completed");
+        MAIN_INFO_1("Algorithm execution completed");
     }
 
 

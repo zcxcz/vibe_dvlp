@@ -22,23 +22,23 @@ int main(const int argc, const char *argv[]) {
     string config_path = "/home/sheldon/hls_project/vibe_crop/src/vibe.json";
     ifstream f(config_path);
     if (!f.is_open()) {
-        main_error(GEN_IMAGE_MAIN_SECTION, "Cannot open vibe.json configuration file");
+        MAIN_ERROR_1("Cannot open vibe.json configuration file");
     }
-    main_info(GEN_IMAGE_MAIN_SECTION, "vibe.json configuration file path: " + config_path);
+    MAIN_INFO_1("vibe.json configuration file path: " + config_path);
     
     json data = json::parse(f);
     f.close();
-    main_info(GEN_IMAGE_MAIN_SECTION, "vibe.json configuration file parse follow...");
-    main_info(GEN_IMAGE_MAIN_SECTION, data.dump(2));
+    MAIN_INFO_1("vibe.json configuration file parse follow...");
+    MAIN_INFO_1(data.dump(2));
     
     // object loading
-    main_info(GEN_IMAGE_MAIN_SECTION, "object: image_info print follow...");
+    MAIN_INFO_1("object: image_info print follow...");
     ImageSection image_section = data["image_info"].get<ImageSection>();
-    main_info(GEN_IMAGE_MAIN_SECTION, "object: register_info print follow...");
+    MAIN_INFO_1("object: register_info print follow...");
     RegisterSection register_section = data["register_info"].get<RegisterSection>();
-    main_info(GEN_IMAGE_MAIN_SECTION, "object: image_info print follow...");
+    MAIN_INFO_1("object: image_info print follow...");
     image_section.print_values();
-    main_info(GEN_IMAGE_MAIN_SECTION, "object: register_info print follow...");
+    MAIN_INFO_1("object: register_info print follow...");
     register_section.print_values();
     
     int width = register_section.reg_image_width.reg_initial_value[0];

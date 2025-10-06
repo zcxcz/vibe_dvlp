@@ -4,6 +4,8 @@
 // std
 #include <string>
 
+using std::string;
+
 // Forward declarations
 struct AlgRegisterSection {
     // register info

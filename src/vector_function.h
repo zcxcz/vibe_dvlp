@@ -25,7 +25,7 @@ vector<T> vector_read_from_file(const string& filename) {
     vector<T> data;
     
     if (!input_file) {
-        main_error(VECTOR_FUNCTION_SECTION, "Cannot open input file: " + filename);
+        MAIN_ERROR_1("Cannot open input file: " + filename);
         return data;
     }
     

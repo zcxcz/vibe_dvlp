@@ -8,46 +8,67 @@
 
 // tool
 #include "json.hpp"
+#include "print_function.h"
 #include "vector_function.hpp"
 
 // ip
+#include "hls_info.h"
 #include "hls_crop.h"
-#include "hls_dpc.h"
+// #include "hls_dpc.h"
 
 // using
 using json = nlohmann::json;
 using namespace std;
 using namespace hls;
 
+template <typename HLS_INPUT_DATA_TYPE, typename HLS_OUTPUT_DATA_TYPE>
+class HlsTop {
+public:
+    HlsTop();
+    ~HlsTop();
+    
+    // section object
+    HlsRegisterSection hls_register_section;
+    HlsImageSection hls_image_section;
+    HlsOutputSection hls_output_section;
 
+    // data object
+    vector<HLS_INPUT_DATA_TYPE> hls_crop_input_image;
+    vector<HLS_INPUT_DATA_TYPE> hls_crop_output_image;
+    vector<HLS_OUTPUT_DATA_TYPE> hls_dpc_output_image;
+
+    // ip object
+    HlsCrop<HLS_INPUT_DATA_TYPE, HLS_INPUT_DATA_TYPE> hls_crop;
+    // HlsDpc<HLS_INPUT_DATA_TYPE, HLS_OUTPUT_DATA_TYPE> hls_dpc;
+    
 // 从JSON文件加载配置
-HlsTopConfig load_config(const string& config_path) {
-    HlsTopConfig config;
-    ifstream f(config_path);
-    if (!f.is_open()) {
-        cout << "Error: Cannot open config file: " << config_path << endl;
+    load_config(const string& config_path) {
+        ifstream f(config_path);
+        if (!f.is_open()) {
+            MAIN_ERROR_1("Error: Cannot open config file");
+        }
+        
+        MAIN_INFO_1("Success Open config file: ";
+        json data = json::parse(f);
+        config.generate_random_image = data["image_info"]["generate_random_image"];
+        config.random_image_path = data["image_info"]["random_image_path"];
+        config.width = data["register_info"]["reg_image_width"]["reg_initial_value"][0];
+        config.height = data["register_info"]["reg_image_height"]["reg_initial_value"][0];
+        config.crop_start_x = data["register_info"]["reg_crop_start_x"]["reg_initial_value"][0];
+        config.crop_start_y = data["register_info"]["reg_crop_start_y"]["reg_initial_value"][0];
+        config.crop_end_x = data["register_info"]["reg_crop_end_x"]["reg_initial_value"][0];
+        config.crop_end_y = data["register_info"]["reg_crop_end_y"]["reg_initial_value"][0];
+        config.crop_enable = (data["register_info"]["reg_crop_enable"]["reg_initial_value"][0] != 0);
+        config.dpc_enable = (data["register_info"]["reg_dpc_enable"]["reg_initial_value"][0] != 0);
+        config.dpc_threshold = data["register_info"]["reg_dpc_threshold"]["reg_initial_value"][0];
+        config.input_file = data["common"]["input_file"];
+        config.crop_output_file = data["common"]["hls_crop_output_file"];
+        config.dpc_output_file = data["common"]["hls_dpc_output_file"];
+        
         return config;
     }
-    
-    cout << "Success: Open config file: " << config_path << endl;
-    json data = json::parse(f);
-    config.generate_random_image = data["image_info"]["generate_random_image"];
-    config.random_image_path = data["image_info"]["random_image_path"];
-    config.width = data["register_info"]["reg_image_width"]["reg_initial_value"][0];
-    config.height = data["register_info"]["reg_image_height"]["reg_initial_value"][0];
-    config.crop_start_x = data["register_info"]["reg_crop_start_x"]["reg_initial_value"][0];
-    config.crop_start_y = data["register_info"]["reg_crop_start_y"]["reg_initial_value"][0];
-    config.crop_end_x = data["register_info"]["reg_crop_end_x"]["reg_initial_value"][0];
-    config.crop_end_y = data["register_info"]["reg_crop_end_y"]["reg_initial_value"][0];
-    config.crop_enable = (data["register_info"]["reg_crop_enable"]["reg_initial_value"][0] != 0);
-    config.dpc_enable = (data["register_info"]["reg_dpc_enable"]["reg_initial_value"][0] != 0);
-    config.dpc_threshold = data["register_info"]["reg_dpc_threshold"]["reg_initial_value"][0];
-    config.input_file = data["common"]["input_file"];
-    config.crop_output_file = data["common"]["hls_crop_output_file"];
-    config.dpc_output_file = data["common"]["hls_dpc_output_file"];
-    
-    return config;
-}
+
+};
 
 int main(int argc, char* argv[]) {
     // 加载配置
