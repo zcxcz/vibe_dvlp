@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 // tool
 #include "json.hpp"
@@ -12,15 +13,16 @@
 
 // ip
 #include "alg_top.h"
-#include <algorithm>
 
+// using
 using json = nlohmann::json;
 using namespace std;
 
 // def
-#define ALG_MAIN_SECTION "[AlgMain]"
+// #define ALG_MAIN_SECTION "[AlgMain]"
 #define ALG_INPUT_DATA_TYPE uint16_t
 #define ALG_OUTPUT_DATA_TYPE uint16_t
+
 
 int main(const int argc, const char *argv[]) {
     // json config loading
@@ -37,11 +39,11 @@ int main(const int argc, const char *argv[]) {
     MAIN_INFO_1(data.dump(2));
     
     // object loading
-    MAIN_INFO_1("object: image_section print follow...");
+    MAIN_INFO_1("object: image_section parse follow...");
     ImageSection image_section = data["image_info"].get<ImageSection>();
-    MAIN_INFO_1("object: register_section print follow...");
+    MAIN_INFO_1("object: register_section parse follow...");
     RegisterSection register_section = data["register_info"].get<RegisterSection>();
-    MAIN_INFO_1("object: output_section print follow...");
+    MAIN_INFO_1("object: output_section parse follow...");
     OutputSection output_section = data["output_info"].get<OutputSection>();
 
     // object print
@@ -57,7 +59,7 @@ int main(const int argc, const char *argv[]) {
     MAIN_INFO_1("image width: " + to_string(width));
     MAIN_INFO_1("image height: " + to_string(height));
     
-    // src image loading
+    // src image load
     string source_image_path;
     vector<ALG_INPUT_DATA_TYPE> input_image;
     vector<ALG_OUTPUT_DATA_TYPE> output_image;
@@ -75,9 +77,7 @@ int main(const int argc, const char *argv[]) {
     // alg_top run
     MAIN_INFO_1("alg_top run...");
     AlgTop<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE> alg_top;
-    alg_top.loadSection(register_section, image_section, output_section);
-    alg_top.printSection();
-    alg_top.run(input_image, output_image);
+    alg_top.run(register_section, image_section, output_section);
     
     return 0;
 }

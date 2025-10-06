@@ -12,13 +12,17 @@
 // tool
 #include "print_function.h"
 
+// ip
+#include "hls_info.h"
+#include "hls_crop.h"
+
 // def
 #define VECTOR_FUNCTION_SECTION "[vector_function]"
 
 // using
 using namespace std;
 
-// 模板函数实现
+
 template <typename T>
 vector<T> vector_read_from_file(const string& filename) {
     ifstream input_file(filename);
@@ -79,9 +83,32 @@ bool vector_write_to_file(const std::string& filename, const std::vector<T>& dat
 }
 
 template <typename T, typename U>
+void vector_to_stream(const vector<T>& rdata, hls::stream<U>& wdata) {
+    for (size_t i = 0; i < rdata.size(); ++i) {
+        U data_pkt;
+        if (rdata[i] >= 256) {
+            std::cerr << "Warning: Value " << rdata[i] << " exceeds 8-bit range, truncating" << std::endl;
+            data_pkt.data = 255; // 8-bit max
+        } else {
+            data_pkt.data = rdata[i];
+        }
+        data_pkt.last = (i == rdata.size() - 1) ? 1 : 0;
+        wdata.write(data_pkt);
+    }
+}
+
+template <typename T, typename U>
+void stream_to_vector(hls::stream<U>& rdata, vector<T>& wdata) {
+    while (!rdata.empty()) {
+        auto data_pkt = rdata.read();
+        wdata.push_back(static_cast<T>(data_pkt.data));
+    }
+}
+
+template <typename T, typename U>
 bool vector_compare(const std::vector<T>& vec1, const std::vector<U>& vec2) {
     if (vec1.size() != vec2.size()) {
-        std::cerr << "Vector sizes differ: " << vec1.size() << " vs " << vec2.size() << std::endl;
+        MAIN_ERROR_1("Vector sizes differ: " + to_string(vec1.size()) + " vs " + to_string(vec2.size()));
         return false;
     }
     

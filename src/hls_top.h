@@ -1,3 +1,6 @@
+#ifndef HLS_TOP_H
+#define HLS_TOP_H
+
 // std
 #include <iostream>
 #include <fstream>
@@ -8,8 +11,9 @@
 
 // tool
 #include "json.hpp"
+#include "parse_json_function.h"
 #include "print_function.h"
-#include "vector_function.hpp"
+#include "vector_function.h"
 
 // ip
 #include "hls_info.h"
@@ -21,11 +25,24 @@ using json = nlohmann::json;
 using namespace std;
 using namespace hls;
 
-template <typename HLS_INPUT_DATA_TYPE, typename HLS_OUTPUT_DATA_TYPE>
+// def
+#define HLS_CROP_INPUT_DATA_BITWIDTH    HLS_INPUT_DATA_BITWIDTH
+#define HLS_CROP_OUTPUT_DATA_BITWIDTH   HLS_OUTPUT_DATA_BITWIDTH
+#define HLS_DPC_INPUT_DATA_BITWIDTH     HLS_INPUT_DATA_BITWIDTH
+#define HLS_DPC_OUTPUT_DATA_BITWIDTH    HLS_OUTPUT_DATA_BITWIDTH
+
+
+template <typename ALG_INPUT_DATA_TYPE, typename ALG_OUTPUT_DATA_TYPE, int HLS_INPUT_DATA_BITWIDTH, int HLS_OUTPUT_DATA_BITWIDTH>
 class HlsTop {
 public:
-    HlsTop();
-    ~HlsTop();
+    HlsTop() {};
+    ~HlsTop() {};
+    // HlsTop<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE, HLS_INPUT_DATA_BITWIDTH, HLS_OUTPUT_DATA_BITWIDTH>() {
+    //     MAIN_INFO_1("HlsTop constructor called");
+    // }
+    // ~HlsTop<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE, HLS_INPUT_DATA_BITWIDTH, HLS_OUTPUT_DATA_BITWIDTH>() {
+    //     MAIN_INFO_1("HlsTop destructor called");
+    // }
     
     // section object
     HlsRegisterSection hls_register_section;
@@ -33,147 +50,150 @@ public:
     HlsOutputSection hls_output_section;
 
     // data object
-    vector<HLS_INPUT_DATA_TYPE> hls_crop_input_image;
-    vector<HLS_INPUT_DATA_TYPE> hls_crop_output_image;
-    vector<HLS_OUTPUT_DATA_TYPE> hls_dpc_output_image;
-
-    // ip object
-    HlsCrop<HLS_INPUT_DATA_TYPE, HLS_INPUT_DATA_TYPE> hls_crop;
-    // HlsDpc<HLS_INPUT_DATA_TYPE, HLS_OUTPUT_DATA_TYPE> hls_dpc;
+    vector<ALG_INPUT_DATA_TYPE> hls_input_image;
+    vector<ALG_OUTPUT_DATA_TYPE> hls_output_image;
     
-// 从JSON文件加载配置
-    load_config(const string& config_path) {
-        ifstream f(config_path);
-        if (!f.is_open()) {
-            MAIN_ERROR_1("Error: Cannot open config file");
-        }
-        
-        MAIN_INFO_1("Success Open config file: ";
-        json data = json::parse(f);
-        config.generate_random_image = data["image_info"]["generate_random_image"];
-        config.random_image_path = data["image_info"]["random_image_path"];
-        config.width = data["register_info"]["reg_image_width"]["reg_initial_value"][0];
-        config.height = data["register_info"]["reg_image_height"]["reg_initial_value"][0];
-        config.crop_start_x = data["register_info"]["reg_crop_start_x"]["reg_initial_value"][0];
-        config.crop_start_y = data["register_info"]["reg_crop_start_y"]["reg_initial_value"][0];
-        config.crop_end_x = data["register_info"]["reg_crop_end_x"]["reg_initial_value"][0];
-        config.crop_end_y = data["register_info"]["reg_crop_end_y"]["reg_initial_value"][0];
-        config.crop_enable = (data["register_info"]["reg_crop_enable"]["reg_initial_value"][0] != 0);
-        config.dpc_enable = (data["register_info"]["reg_dpc_enable"]["reg_initial_value"][0] != 0);
-        config.dpc_threshold = data["register_info"]["reg_dpc_threshold"]["reg_initial_value"][0];
-        config.input_file = data["common"]["input_file"];
-        config.crop_output_file = data["common"]["hls_crop_output_file"];
-        config.dpc_output_file = data["common"]["hls_dpc_output_file"];
-        
-        return config;
+    // ip object
+    HlsCrop<HLS_INPUT_DATA_BITWIDTH, HLS_OUTPUT_DATA_BITWIDTH> hls_crop;
+    // HlsDpc<HLS_INPUT_DATA_BITWIDTH, HLS_OUTPUT_DATA_BITWIDTH> hls_dpc;
+
+
+    // section operation
+    void loadRegisterSection(const RegisterSection& register_section) {
+        MAIN_INFO_1("Register Section loading...");
+        hls_register_section.reg_image_width = ap_uint<16>(register_section.reg_image_width.reg_initial_value[0]);
+        hls_register_section.reg_image_height = ap_uint<16>(register_section.reg_image_height.reg_initial_value[0]);
+        hls_register_section.reg_crop_enable = (register_section.reg_crop_enable.reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
+        hls_register_section.reg_crop_start_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_start_x.reg_initial_value[0]));
+        hls_register_section.reg_crop_start_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_start_y.reg_initial_value[0]));
+        hls_register_section.reg_crop_end_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_end_x.reg_initial_value[0]));
+        hls_register_section.reg_crop_end_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_end_y.reg_initial_value[0]));
+
+        hls_register_section.reg_dpc_enable = (register_section.reg_dpc_enable.reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
+        hls_register_section.reg_dpc_threshold = ap_uint<16>(static_cast<unsigned short>(register_section.reg_dpc_threshold.reg_initial_value[0]));
     }
+
+    void loadImageSection(const ImageSection& image_section) {
+        MAIN_INFO_1("Image Section loading...");
+        hls_image_section.image_path = image_section.image_path;
+        hls_image_section.random_image_path = image_section.random_image_path;
+        hls_image_section.generate_random_image = image_section.generate_random_image;
+    }
+
+    void loadOutputSection(const OutputSection& output_section) {
+        MAIN_INFO_1("Output Section loading...");
+        hls_output_section.alg_crop_output_path = output_section.alg_crop_output_path;
+        hls_output_section.alg_dpc_output_path = output_section.alg_dpc_output_path;
+        hls_output_section.hls_crop_output_path = output_section.hls_crop_output_path;
+        hls_output_section.hls_dpc_output_path = output_section.hls_dpc_output_path;
+    }
+
+    void loadSection(const RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
+        loadRegisterSection(register_section);
+        loadImageSection(image_section);
+        loadOutputSection(output_section);
+    }
+
+    void loadImage() {
+        MAIN_INFO_1("Image loading...");
+        if (hls_image_section.generate_random_image) {
+            hls_input_image = vector_read_from_file<ALG_INPUT_DATA_TYPE>(hls_image_section.random_image_path);
+        } else {
+            hls_input_image = vector_read_from_file<ALG_INPUT_DATA_TYPE>(hls_image_section.image_path);
+        }
+    }
+
+
+    void printRegisterSection() {
+        MAIN_INFO_1("Register Section printing...");
+        cout << "reg_image_width: " << (uint16_t)hls_register_section.reg_image_width << endl;
+        cout << "reg_image_height: " << (uint16_t)hls_register_section.reg_image_height << endl;
+        cout << "reg_crop_enable: " << (bool)hls_register_section.reg_crop_enable << endl;
+        cout << "reg_crop_start_x: " << (uint16_t)hls_register_section.reg_crop_start_x << endl;
+        cout << "reg_crop_start_y: " << (uint16_t)hls_register_section.reg_crop_start_y << endl;
+        cout << "reg_crop_end_x: " << (uint16_t)hls_register_section.reg_crop_end_x << endl;
+        cout << "reg_crop_end_y: " << (uint16_t)hls_register_section.reg_crop_end_y << endl;
+        cout << "reg_dpc_enable: " << (bool)hls_register_section.reg_dpc_enable << endl;
+        cout << "reg_dpc_threshold: " << (uint16_t)hls_register_section.reg_dpc_threshold << endl;
+    }
+
+    void printImageSection() {
+        MAIN_INFO_1("Image Section printing...");
+        cout << "image_path: " << hls_image_section.image_path << endl;
+        cout << "random_image_path: " << hls_image_section.random_image_path << endl;
+        cout << "generate_random_image: " << hls_image_section.generate_random_image << endl;
+    }
+
+    void printOutputSection() {
+        MAIN_INFO_1("Output Section printing...");
+        cout << "alg_crop_output_path: " << hls_output_section.alg_crop_output_path << endl;
+        cout << "alg_dpc_output_path: " << hls_output_section.alg_dpc_output_path << endl;
+        cout << "hls_crop_output_path: " << hls_output_section.hls_crop_output_path << endl;
+        cout << "hls_dpc_output_path: " << hls_output_section.hls_dpc_output_path << endl;
+    }
+
+    void printSection() {
+        printRegisterSection();
+        printImageSection();
+        printOutputSection();
+    }
+
+    // template <typename T, typename U>
+    // hls::stream<U>& vector_to_stream(const vector<T>& data) {
+    //     hls::stream<U> stream;
+    //     for (size_t i = 0; i < data.size(); ++i) {
+    //         U data_pkt;
+    //         if (data[i] >= 256) {
+    //             std::cerr << "Warning: Value " << data[i] << " exceeds 8-bit range, truncating" << std::endl;
+    //             data_pkt.data = 255; // 8-bit max
+    //         } else {
+    //             data_pkt.data = static_cast<U>(data[i]);
+    //         }
+    //         data_pkt.last = (i == data.size() - 1) ? 1 : 0;
+    //         stream.write(data_pkt);
+    //     }
+    //     return stream;
+    // }
+
+    // template <typename T, typename U>
+    // vector<T> stream_to_vector(hls::stream<U>& stream) {
+    //     vector<T> data;
+    //     while (!stream.empty()) {
+    //         auto data_pkt = stream.read();
+    //         data.push_back(static_cast<T>(data_pkt.data));
+    //     }
+    //     return data;
+    // }
+
+    void run(const RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
+        // hls initialize
+        MAIN_INFO_1("hls initialize...");
+        loadSection(register_section, image_section, output_section);
+        printSection();
+        loadImage();
+
+        // hls run
+        MAIN_INFO_1("hls run...");      
+        hls::stream<ap_axiu<HLS_INPUT_DATA_BITWIDTH, 0, 0, 0> > hls_crop_input_stream;
+        hls::stream<ap_axiu<HLS_OUTPUT_DATA_BITWIDTH, 0, 0, 0> > hls_crop_output_stream;
+
+        MAIN_INFO_1("hls crop run simulation (skipping actual HLS code)...");
+
+        // data object
+        hls::stream<ap_axiu<HLS_INPUT_DATA_BITWIDTH, 0, 0, 0>> hls_input_stream;
+        hls::stream<ap_axiu<HLS_OUTPUT_DATA_BITWIDTH, 0, 0, 0>> hls_output_stream;
+        
+        vector_to_stream(hls_input_image, hls_input_stream);
+        stream_to_vector(hls_input_stream, hls_output_image);
+
+        // Write output to file
+        vector_write_to_file(hls_output_section.hls_crop_output_path, hls_output_image, hls_register_section.reg_crop_end_x-hls_register_section.reg_crop_start_x+1, hls_register_section.reg_crop_end_y-hls_register_section.reg_crop_start_y+1);
+        MAIN_INFO_1("hls crop output data save to: " + hls_output_section.hls_crop_output_path);
+        MAIN_INFO_1("hls run completed");
+    }
+
 
 };
 
-int main(int argc, char* argv[]) {
-    // 加载配置
-    string config_path = "hls_top_config.json";
-    if (argc > 1) {
-        config_path = argv[1];
-    }
-    HlsTopConfig config = load_config(config_path);
-    
-    // 打印配置信息
-    cout << "HLS Top Module Configuration:" << endl;
-    cout << "Width: " << config.width << endl;
-    cout << "Height: " << config.height << endl;
-    cout << "Crop Enable: " << (config.crop_enable ? "true" : "false") << endl;
-    if (config.crop_enable) {
-        cout << "Crop Region: (" << config.crop_start_x << "," << config.crop_start_y << ") to (" << config.crop_end_x << "," << config.crop_end_y << ")" << endl;
-    }
-    cout << "DPC Enable: " << (config.dpc_enable ? "true" : "false") << endl;
-    if (config.dpc_enable) {
-        cout << "DPC Threshold: " << config.dpc_threshold << endl;
-    }
-    
-    // 加载或生成输入图像
-    vector<uint16_t> input_image;
-    if ( config.generate_random_image == 1) {
-        input_image = generate_random_image(config.width, config.height);
-        cout << "Random image generated with width: " << config.width << ", height: " << config.height << endl;
-        write_vector_to_file(config.random_image_path, input_image, config.width, config.height);
-    } else {
-        ifstream input_file1(config.input_file);
-        ifstream input_file2(config.random_image_path);
-        if (input_file1.is_open()) {
-            cout << "Loading input image from: " << config.input_file << endl;
-            input_image = read_data_to_vector(config.input_file);
-        } else if (input_file2.is_open()) {
-            cout << "Loading random image from: " << config.random_image_path << endl;
-            input_image = read_data_to_vector(config.random_image_path);
-        } else {
-            cout << "generate random image disabled, Input file not found, random image file not found, exit..." << endl;
-            return 1;
-        }
-    }
-    
-    if (input_image.empty()) {
-        cerr << "Error: Input image is empty" << endl;
-        return 1;
-    }
-    
-    // 准备HLS流和寄存器
-    hls::stream<axis_pixel_t> input_stream;
-    hls::stream<axis_pixel_t> crop_output_stream;
-    hls::stream<axis_pixel_t> dpc_input_stream;
-    hls::stream<axis_pixel_t> dpc_output_stream;
-    
-    // 将输入数据转换为HLS流
-    vector_to_stream(input_image, input_stream);
-    
-    // 实例化HLS模块
-    HlsCrop hls_crop;
-    HlsDpc hls_dpc;
 
-    // HLS裁剪处理
-    vector<uint16_t> crop_result;
-    if (config.crop_enable) {
-        cout << "Running HLS crop module..." << endl;
-        HlsCropRegisterInfo crop_regs;
-        crop_regs.image_width = config.width;
-        crop_regs.image_height = config.height;
-        crop_regs.crop_start_x = config.crop_start_x;
-        crop_regs.crop_start_y = config.crop_start_y;
-        crop_regs.crop_end_x = config.crop_end_x;
-        crop_regs.crop_end_y = config.crop_end_y;
-        crop_regs.crop_enable = config.crop_enable ? 1 : 0;
-        
-        hls_crop.process(input_stream, crop_output_stream, crop_regs);
-        crop_result = stream_to_vector(crop_output_stream);
-        write_vector_to_file(config.crop_output_file, crop_result);
-        cout << "HLS crop result saved to: " << config.crop_output_file << endl;
-    } else {
-        // 不裁剪时，直接将输入流转换为结果
-        crop_result = input_image;
-    }
-    
-    // HLS DPC处理
-    vector<uint16_t> dpc_result;
-    if (config.dpc_enable) {
-        cout << "Running HLS DPC module..." << endl;
-        // 准备DPC输入流
-        vector_to_stream(crop_result, dpc_input_stream);
-        
-        // 配置DPC寄存器
-        HlsDpcRegisterInfo dpc_regs;
-        int dpc_width = config.crop_enable ? (config.crop_end_x - config.crop_start_x + 1) : config.width;
-        int dpc_height = config.crop_enable ? (config.crop_end_y - config.crop_start_y + 1) : config.height;
-        dpc_regs.image_width = dpc_width;
-        dpc_regs.image_height = dpc_height;
-        dpc_regs.dpc_enable = config.dpc_enable ? 1 : 0;
-        dpc_regs.dpc_threshold = config.dpc_threshold;
-        
-        hls_dpc.Process(dpc_input_stream, dpc_output_stream, dpc_regs);
-        dpc_result = stream_to_vector(dpc_output_stream);
-        write_vector_to_file(config.dpc_output_file, dpc_result);
-        cout << "HLS DPC result saved to: " << config.dpc_output_file << endl;
-    }
-    
-    cout << "HLS top module completed successfully" << endl;
-    return 0;
-}
+#endif

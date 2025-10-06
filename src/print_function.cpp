@@ -1,8 +1,4 @@
 #include "print_function.h"
-#include <cstdlib>
-
-// using
-using namespace std;
 
 void main_info(const string& section, const string& msg) {
     cout << "[" << section << "] Info: " << msg << endl;

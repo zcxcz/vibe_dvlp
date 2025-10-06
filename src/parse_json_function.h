@@ -1,12 +1,16 @@
 #ifndef IMAGE_INFO_H
 #define IMAGE_INFO_H
 
+// std
 #include <string>
 #include <iostream>
+
+// tool
 #include "json.hpp"
 
 using json = nlohmann::json;
 using namespace std;
+
 
 struct ImageSection {
     string image_path;

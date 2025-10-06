@@ -38,12 +38,11 @@ public:
     AlgOutputSection alg_output_section;
 
     // data object
-    vector<ALG_INPUT_DATA_TYPE> alg_crop_input_image;
-    vector<ALG_INPUT_DATA_TYPE> alg_crop_output_image;
-    vector<ALG_OUTPUT_DATA_TYPE> alg_dpc_output_image;
+    vector<ALG_INPUT_DATA_TYPE> alg_input_image;
+    vector<ALG_OUTPUT_DATA_TYPE> alg_output_image;
 
     // ip object
-    AlgCrop<ALG_INPUT_DATA_TYPE, ALG_INPUT_DATA_TYPE> alg_crop;
+    AlgCrop<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE> alg_crop;
     // AlgDpc<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE> alg_dpc;
 
 
@@ -87,17 +86,17 @@ public:
 
     
     void loadImage() {
-        MAIN_INFO_1("Loading source image...");
+        MAIN_INFO_1("Image loading...");
         if (alg_image_section.generate_random_image) {
-            alg_crop_input_image = vector_read_from_file<ALG_INPUT_DATA_TYPE>(alg_image_section.random_image_path);
+            alg_input_image = vector_read_from_file<ALG_INPUT_DATA_TYPE>(alg_image_section.random_image_path);
         } else {
-            alg_crop_input_image = vector_read_from_file<ALG_INPUT_DATA_TYPE>(alg_image_section.image_path);
+            alg_input_image = vector_read_from_file<ALG_INPUT_DATA_TYPE>(alg_image_section.image_path);
         }
     }
 
 
     void printRegisterSection() {
-        MAIN_INFO_1("Register Section Configuration");
+        MAIN_INFO_1("Register Section printing...");
         cout << "Width: " << alg_register_section.reg_image_width << endl;
         cout << "Height: " << alg_register_section.reg_image_height << endl;
         cout << "Crop Enable: " << (alg_register_section.reg_crop_enable ? "true" : "false") << endl;
@@ -110,14 +109,14 @@ public:
     }
 
     void printImageSection() {
-        MAIN_INFO_1("Image Section Configuration");
+        MAIN_INFO_1("Image Section printing...");
         cout << "Input File: " << alg_image_section.image_path << endl;
         cout << "Random Image Path: " << alg_image_section.random_image_path << endl;
         cout << "Generate Random Image: " << (alg_image_section.generate_random_image ? "true" : "false") << endl;
     }
 
     void printOutputSection() {
-        MAIN_INFO_1("Output Section Configuration");
+        MAIN_INFO_1("Output Section printing...");
         cout << "Crop Output File: " << alg_output_section.alg_crop_output_path << endl;
         cout << "DPC Output File: " << alg_output_section.alg_dpc_output_path << endl;
         cout << "HLS Crop Output File: " << alg_output_section.hls_crop_output_path << endl;
@@ -131,20 +130,25 @@ public:
     }
 
 
-    void run(const vector<ALG_INPUT_DATA_TYPE>& input_image, vector<ALG_OUTPUT_DATA_TYPE>& output_image) {
-        MAIN_INFO_1("AlgTop run...");
-        
-        // src image loading...
+    void run(const RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
+        // alg initialize
+        MAIN_INFO_1("AlgTop initialize...");
+        loadSection(register_section, image_section, output_section);
         loadImage();
-        
-        // alg crop running...
-        MAIN_INFO_1("Running crop algorithm...");
+        printSection();
+
+        // alg run
+        MAIN_INFO_1("alg run...");
+        vector<ALG_INPUT_DATA_TYPE> alg_crop_input_image;
+        vector<ALG_OUTPUT_DATA_TYPE> alg_crop_output_image;
+        alg_crop_input_image = alg_input_image;
+        MAIN_INFO_1("alg crop run...");
         alg_crop.run(alg_crop_input_image, alg_crop_output_image, alg_register_section);
-        MAIN_INFO_1("Saving crop output to: " + alg_output_section.alg_crop_output_path);
-        vector_write_to_file<ALG_OUTPUT_DATA_TYPE>(alg_output_section.alg_crop_output_path, alg_crop_output_image, 
-                                                        alg_register_section.reg_image_width, alg_register_section.reg_image_height);
+        MAIN_INFO_1("crop output data save to: " + alg_output_section.alg_crop_output_path);
+        vector_write_to_file<ALG_OUTPUT_DATA_TYPE>(alg_output_section.alg_crop_output_path, alg_crop_output_image, alg_register_section.reg_image_width, alg_register_section.reg_image_height);
+        alg_output_image = alg_crop_output_image;
         
-        MAIN_INFO_1("Algorithm execution completed");
+        MAIN_INFO_1("alg run completed");
     }
 
 

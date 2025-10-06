@@ -3,7 +3,12 @@
 
 // std
 #include <string>
+#include <cstdlib>
 #include <iostream>
+
+// using
+using namespace std;
+
 
 void main_info(const std::string& section, const std::string& msg);
 void main_error(const std::string& section, const std::string& msg);
