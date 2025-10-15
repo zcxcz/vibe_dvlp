@@ -54,8 +54,8 @@ int main(const int argc, const char *argv[]) {
     MAIN_INFO_1("object: output_section print follow...");
     output_section.print_values();
 
-    int width = register_section.reg_image_width.reg_initial_value[0];
-    int height = register_section.reg_image_height.reg_initial_value[0];
+    int width = register_section.reg_map["reg_image_width"].reg_initial_value[0];
+    int height = register_section.reg_map["reg_image_height"].reg_initial_value[0];
     MAIN_INFO_1("image width: " + to_string(width));
     MAIN_INFO_1("image height: " + to_string(height));
     

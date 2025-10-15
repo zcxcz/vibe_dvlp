@@ -10,6 +10,7 @@
 #include "print_function.h"
 #include "vector_function.h"
 #include "parse_json_function.h"
+#include "parse_csv_function.h"
 
 // hls
 #include <ap_int.h>
@@ -45,23 +46,28 @@ int main(const int argc, const char *argv[]) {
     MAIN_INFO_1("vibe.json configuration file parse follow...");
     MAIN_INFO_1(data.dump(2));
     
-    // object loading
+    // json loading
     MAIN_INFO_1("object: image_section parse follow...");
     ImageSection image_section = data["image_info"].get<ImageSection>();
-    MAIN_INFO_1("object: register_section parse follow...");
-    RegisterSection register_section = data["register_info"].get<RegisterSection>();
     MAIN_INFO_1("object: output_section parse follow...");
     OutputSection output_section = data["output_info"].get<OutputSection>();
+    // MAIN_INFO_1("object: register_section parse follow...");
+    // RegisterSection register_section = data["register_info"].get<RegisterSection>();
 
     MAIN_INFO_1("object: image_section parse follow...");
     image_section.print_values();
-    MAIN_INFO_1("object: register_section parse follow...");
-    register_section.print_values();
     MAIN_INFO_1("object: output_section parse follow...");
     output_section.print_values();
+    // MAIN_INFO_1("object: register_section parse follow...");
+    // register_section.print_values();
+    // register_section.randomize_check();
+
+    // csv loading
+    MAIN_INFO_1("object: register_section parse follow...");
+    RegisterSection register_section = data["register_info"].get<RegisterSection>();
     
-    int width = register_section.reg_image_width.reg_initial_value[0];
-    int height = register_section.reg_image_height.reg_initial_value[0];
+    int width = register_section.reg_map["reg_image_width"].reg_initial_value[0];
+    int height = register_section.reg_map["reg_image_height"].reg_initial_value[0];
     MAIN_INFO_1("image width: " + to_string(width));
     MAIN_INFO_1("image height: " + to_string(height));
 

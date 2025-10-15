@@ -59,18 +59,17 @@ public:
 
 
     // section operation
-    void loadRegisterSection(const RegisterSection& register_section) {
+    void loadRegisterSection(RegisterSection& register_section) {
         MAIN_INFO_1("Register Section loading...");
-        hls_register_section.reg_image_width = ap_uint<16>(register_section.reg_image_width.reg_initial_value[0]);
-        hls_register_section.reg_image_height = ap_uint<16>(register_section.reg_image_height.reg_initial_value[0]);
-        hls_register_section.reg_crop_enable = (register_section.reg_crop_enable.reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
-        hls_register_section.reg_crop_start_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_start_x.reg_initial_value[0]));
-        hls_register_section.reg_crop_start_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_start_y.reg_initial_value[0]));
-        hls_register_section.reg_crop_end_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_end_x.reg_initial_value[0]));
-        hls_register_section.reg_crop_end_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_crop_end_y.reg_initial_value[0]));
-
-        hls_register_section.reg_dpc_enable = (register_section.reg_dpc_enable.reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
-        hls_register_section.reg_dpc_threshold = ap_uint<16>(static_cast<unsigned short>(register_section.reg_dpc_threshold.reg_initial_value[0]));
+        hls_register_section.reg_image_width = ap_uint<16>(register_section.reg_map["reg_image_width"].reg_initial_value[0]);
+        hls_register_section.reg_image_height = ap_uint<16>(register_section.reg_map["reg_image_height"].reg_initial_value[0]);
+        hls_register_section.reg_crop_enable = (register_section.reg_map["reg_crop_enable"].reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
+        hls_register_section.reg_crop_start_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_start_x"].reg_initial_value[0]));
+        hls_register_section.reg_crop_start_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_start_y"].reg_initial_value[0]));
+        hls_register_section.reg_crop_end_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_end_x"].reg_initial_value[0]));
+        hls_register_section.reg_crop_end_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_end_y"].reg_initial_value[0]));
+        hls_register_section.reg_dpc_enable = (register_section.reg_map["reg_dpc_enable"].reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
+        hls_register_section.reg_dpc_threshold = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_dpc_threshold"].reg_initial_value[0]));
     }
 
     void loadImageSection(const ImageSection& image_section) {
@@ -88,7 +87,7 @@ public:
         hls_output_section.hls_dpc_output_path = output_section.hls_dpc_output_path;
     }
 
-    void loadSection(const RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
+    void loadSection(RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
         loadRegisterSection(register_section);
         loadImageSection(image_section);
         loadOutputSection(output_section);
@@ -165,7 +164,7 @@ public:
     //     return data;
     // }
 
-    void run(const RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
+    void run(RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
         // hls initialize
         MAIN_INFO_1("hls initialize...");
         loadSection(register_section, image_section, output_section);
@@ -174,20 +173,22 @@ public:
 
         // hls run
         MAIN_INFO_1("hls run...");      
-        hls::stream<ap_axiu<HLS_INPUT_DATA_BITWIDTH, 0, 0, 0> > hls_crop_input_stream;
-        hls::stream<ap_axiu<HLS_OUTPUT_DATA_BITWIDTH, 0, 0, 0> > hls_crop_output_stream;
-
-        MAIN_INFO_1("hls crop run simulation (skipping actual HLS code)...");
-
         // data object
         hls::stream<ap_axiu<HLS_INPUT_DATA_BITWIDTH, 0, 0, 0>> hls_input_stream;
         hls::stream<ap_axiu<HLS_OUTPUT_DATA_BITWIDTH, 0, 0, 0>> hls_output_stream;
-        
+
+        MAIN_INFO_1("hls crop run simulation (skipping actual HLS code)...");
+
         vector_to_stream(hls_input_image, hls_input_stream);
-        stream_to_vector(hls_input_stream, hls_output_image);
+        hls_crop.run(hls_input_stream, hls_output_stream, hls_register_section);
+        stream_to_vector(hls_output_stream, hls_output_image);
 
         // Write output to file
-        vector_write_to_file(hls_output_section.hls_crop_output_path, hls_output_image, hls_register_section.reg_crop_end_x-hls_register_section.reg_crop_start_x+1, hls_register_section.reg_crop_end_y-hls_register_section.reg_crop_start_y+1);
+        int crop_image_width = hls_register_section.reg_crop_end_x-hls_register_section.reg_crop_start_x+1;
+        int crop_image_height = hls_register_section.reg_crop_end_y-hls_register_section.reg_crop_start_y+1;
+        MAIN_INFO_1("hls crop output image width: " + std::to_string(crop_image_width));
+        MAIN_INFO_1("hls crop output image height: " + std::to_string(crop_image_height));
+        vector_write_to_file(hls_output_section.hls_crop_output_path, hls_output_image, crop_image_width, crop_image_height);
         MAIN_INFO_1("hls crop output data save to: " + hls_output_section.hls_crop_output_path);
         MAIN_INFO_1("hls run completed");
     }

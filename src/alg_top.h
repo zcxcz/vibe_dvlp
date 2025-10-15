@@ -29,8 +29,8 @@ using namespace std;
 template <typename ALG_INPUT_DATA_TYPE, typename ALG_OUTPUT_DATA_TYPE>
 class AlgTop {
 public:
-    AlgTop();
-    ~AlgTop();
+    AlgTop() {};
+    ~AlgTop() {};
     
     // section object
     AlgRegisterSection alg_register_section;
@@ -46,19 +46,19 @@ public:
     // AlgDpc<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE> alg_dpc;
 
 
-    void loadRegisterSection(const RegisterSection& register_section) {
+    void loadRegisterSection(RegisterSection& register_section) {
         // register info
         MAIN_INFO_1("Register Section loading...");
-        alg_register_section.reg_image_width = register_section.reg_image_width.reg_initial_value[0];
-        alg_register_section.reg_image_height = register_section.reg_image_height.reg_initial_value[0];
-        alg_register_section.reg_crop_start_x = register_section.reg_crop_start_x.reg_initial_value[0];
-        alg_register_section.reg_crop_start_y = register_section.reg_crop_start_y.reg_initial_value[0];
-        alg_register_section.reg_crop_end_x = register_section.reg_crop_end_x.reg_initial_value[0];
-        alg_register_section.reg_crop_end_y = register_section.reg_crop_end_y.reg_initial_value[0];
-        alg_register_section.reg_crop_enable = (register_section.reg_crop_enable.reg_initial_value[0] != 0);
+        alg_register_section.reg_image_width = register_section.reg_map["reg_image_width"].reg_initial_value[0];
+        alg_register_section.reg_image_height = register_section.reg_map["reg_image_height"].reg_initial_value[0];
+        alg_register_section.reg_crop_start_x = register_section.reg_map["reg_crop_start_x"].reg_initial_value[0];
+        alg_register_section.reg_crop_start_y = register_section.reg_map["reg_crop_start_y"].reg_initial_value[0];
+        alg_register_section.reg_crop_end_x = register_section.reg_map["reg_crop_end_x"].reg_initial_value[0];
+        alg_register_section.reg_crop_end_y = register_section.reg_map["reg_crop_end_y"].reg_initial_value[0];
+        alg_register_section.reg_crop_enable = (register_section.reg_map["reg_crop_enable"].reg_initial_value[0] != 0);
 
-        alg_register_section.reg_dpc_enable = (register_section.reg_dpc_enable.reg_initial_value[0] != 0);
-        alg_register_section.reg_dpc_threshold = register_section.reg_dpc_threshold.reg_initial_value[0];
+        alg_register_section.reg_dpc_enable = (register_section.reg_map["reg_dpc_enable"].reg_initial_value[0] != 0);
+        alg_register_section.reg_dpc_threshold = register_section.reg_map["reg_dpc_threshold"].reg_initial_value[0];
     }
 
     void loadImageSection(const ImageSection& image_section) {
@@ -78,7 +78,7 @@ public:
         alg_output_section.hls_dpc_output_path = output_section.hls_dpc_output_path;
     }
 
-    void loadSection(const RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
+    void loadSection(RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
         loadRegisterSection(register_section);
         loadImageSection(image_section);
         loadOutputSection(output_section);
@@ -130,7 +130,7 @@ public:
     }
 
 
-    void run(const RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
+    void run(RegisterSection& register_section, const ImageSection& image_section, const OutputSection& output_section) {
         // alg initialize
         MAIN_INFO_1("AlgTop initialize...");
         loadSection(register_section, image_section, output_section);
@@ -145,7 +145,13 @@ public:
         MAIN_INFO_1("alg crop run...");
         alg_crop.run(alg_crop_input_image, alg_crop_output_image, alg_register_section);
         MAIN_INFO_1("crop output data save to: " + alg_output_section.alg_crop_output_path);
-        vector_write_to_file<ALG_OUTPUT_DATA_TYPE>(alg_output_section.alg_crop_output_path, alg_crop_output_image, alg_register_section.reg_image_width, alg_register_section.reg_image_height);
+
+        int crop_image_width = alg_register_section.reg_crop_end_x - alg_register_section.reg_crop_start_x + 1;
+        int crop_image_height = alg_register_section.reg_crop_end_y - alg_register_section.reg_crop_start_y + 1;
+        MAIN_INFO_1("alg crop output image width: " + std::to_string(crop_image_width));
+        MAIN_INFO_1("alg crop output image height: " + std::to_string(crop_image_height));
+
+        vector_write_to_file<ALG_OUTPUT_DATA_TYPE>(alg_output_section.alg_crop_output_path, alg_crop_output_image, crop_image_width, crop_image_height);
         alg_output_image = alg_crop_output_image;
         
         MAIN_INFO_1("alg run completed");

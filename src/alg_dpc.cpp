@@ -158,4 +158,7 @@ std::vector<alg_pixel_t> AlgDpc<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE>::proc
     return output_image;
 }
 
+// 显式模板实例化
+template class AlgDpc<unsigned short, unsigned short>;
+
 

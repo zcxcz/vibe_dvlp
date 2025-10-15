@@ -4,6 +4,7 @@
 // std
 #include <string>
 #include <iostream>
+#include <random>
 
 // tool
 #include "json.hpp"
@@ -44,42 +45,93 @@ struct OutputSection {
     }
 };
 
+/*
+struct RegisterInfo {
+    int reg_bit_width;
+    vector<int> reg_initial_value;
+    int reg_value_min;
+    int reg_value_max;
+};
+
 struct RegisterSection {
-    struct RegisterInfo {
-        int reg_bit_width;
-        vector<int> reg_initial_value;
-        int reg_value_min;
-        int reg_value_max;
-    };
-    
-    RegisterInfo reg_image_width;
-    RegisterInfo reg_image_height;
-    RegisterInfo reg_smooth_filter_enable;
-    RegisterInfo reg_smooth_filter_coeff;
-    RegisterInfo reg_dpc_enable;
-    RegisterInfo reg_dpc_threshold;
-    RegisterInfo reg_crop_enable;
-    RegisterInfo reg_crop_start_x;
-    RegisterInfo reg_crop_start_y;
-    RegisterInfo reg_crop_end_x;
-    RegisterInfo reg_crop_end_y;
+    map<string, RegisterInfo> reg_map;
     
     void print_values() const {
         cout << "RegisterSection:" << endl;
-        cout << "  reg_image_width: " << reg_image_width.reg_initial_value[0] << endl;
-        cout << "  reg_image_height: " << reg_image_height.reg_initial_value[0] << endl;
-        cout << "  reg_smooth_filter_enable: " << reg_smooth_filter_enable.reg_initial_value[0] << endl;
-        cout << "  reg_smooth_filter_coeff: " << reg_smooth_filter_coeff.reg_initial_value[0] << endl;
-        cout << "  reg_dpc_enable: " << reg_dpc_enable.reg_initial_value[0] << endl;
-        cout << "  reg_dpc_threshold: " << reg_dpc_threshold.reg_initial_value[0] << endl;
-        cout << "  reg_crop_enable: " << reg_crop_enable.reg_initial_value[0] << endl;
-        cout << "  reg_crop_start_x: " << reg_crop_start_x.reg_initial_value[0] << endl;
-        cout << "  reg_crop_start_y: " << reg_crop_start_y.reg_initial_value[0] << endl;
-        cout << "  reg_crop_end_x: " << reg_crop_end_x.reg_initial_value[0] << endl;
-        cout << "  reg_crop_end_y: " << reg_crop_end_y.reg_initial_value[0] << endl;
+        for (auto reg : reg_map) {
+            if (reg.second.reg_bit_width == 1) {
+                cout << "  " << setw(30) << reg.first << setw(14) << " = " << setw(8) << reg.second.reg_initial_value[0] << endl;
+            } else {
+                if (reg.second.reg_initial_value.size() > 1) {
+                    cout << "  " << setw(30) << reg.first << "[" << setw(4) <<reg.second.reg_bit_width-1 << ":" << "0] = [";
+                    for (int i=0; i<reg.second.reg_initial_value.size(); i++) {
+                        cout << reg.second.reg_initial_value[i] << " ";
+                    }
+                    cout << "] " << "(range: " << setw(8) << reg.second.reg_value_min << " ~ " << setw(8) << reg.second.reg_value_max << ")" << endl;
+                } else {
+                    cout << "  " << setw(30) << reg.first << "[" << setw(4) << reg.second.reg_bit_width-1 << ":" << setw(4) << "0" << "] = " << setw(8) << reg.second.reg_initial_value[0] << " " << "(range: " << setw(8) << reg.second.reg_value_min << " ~ " << setw(8) << reg.second.reg_value_max << ")" << endl;
+                }
+            }
+        }
     }
+
+    // void randomize_check() const {
+    //     for (auto reg : reg_map) {
+    //         if (reg.second.reg_bit_width == 1) {
+    //             if (reg.second.reg_initial_value[0] != 0 && reg.second.reg_initial_value[0] != 1) {
+    //                 cout << "Error: " << reg.first << " initial value must be 0 or 1" << endl;
+    //             }
+    //         } else {
+    //             if (reg.second.reg_initial_value.size() != reg.second.reg_bit_width) {
+    //                 cout << "Error: " << reg.first << " initial value size must be " << reg.second.reg_bit_width << endl;
+    //             }
+    //         }
+    //     }
+    // }
+
 };
 
+
+inline void from_json(const json& j, RegisterSection& info) {
+    for (auto& reg : j.items()) {
+        from_json(reg.value(), info.reg_map[reg.key()]);
+    }
+    // from_json(j["reg_image_width"], info.reg_image_width);
+    // from_json(j["reg_image_height"], info.reg_image_height);
+    // from_json(j["reg_smooth_filter_enable"], info.reg_smooth_filter_enable);
+    // from_json(j["reg_smooth_filter_coeff"], info.reg_smooth_filter_coeff);
+    // from_json(j["reg_dpc_enable"], info.reg_dpc_enable);
+    // from_json(j["reg_dpc_threshold"], info.reg_dpc_threshold);
+    // from_json(j["reg_crop_enable"], info.reg_crop_enable);
+    // from_json(j["reg_crop_start_x"], info.reg_crop_start_x);
+    // from_json(j["reg_crop_start_y"], info.reg_crop_start_y);
+    // from_json(j["reg_crop_end_x"], info.reg_crop_end_x);
+    // from_json(j["reg_crop_end_y"], info.reg_crop_end_y);
+}
+        
+
+        #define RANDOM_REG_ENABLE
+inline void from_json(const json& j, RegisterInfo& reg) {
+    reg.reg_bit_width = j["reg_bit_width"];
+    reg.reg_value_min = j["reg_value_min"];
+    reg.reg_value_max = j["reg_value_max"];
+    
+    #ifdef RANDOM_REG_ENABLE
+    // randomize register section
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(reg.reg_value_min, reg.reg_value_max);
+    reg.reg_initial_value = j["reg_initial_value"].get<std::vector<int>>();
+    for (int i=0; i<reg.reg_initial_value.size(); i++) {
+            reg.reg_initial_value[i] = dis(gen);
+        }
+        #else
+        reg.reg_initial_value = j["reg_initial_value"].get<std::vector<int>>();
+        #endif
+    }
+*/
+    
+// image_info loading
 inline void from_json(const json& j, ImageSection& info) {
     info.image_path = j["image_path"];
     info.image_format = j["image_format"];
@@ -88,13 +140,7 @@ inline void from_json(const json& j, ImageSection& info) {
     info.random_image_path = j["random_image_path"];
 }
 
-inline void from_json(const json& j, RegisterSection::RegisterInfo& reg) {
-    reg.reg_bit_width = j["reg_bit_width"];
-    reg.reg_initial_value = j["reg_initial_value"].get<std::vector<int>>();
-    reg.reg_value_min = j["reg_value_min"];
-    reg.reg_value_max = j["reg_value_max"];
-}
-
+// output_info loading
 inline void from_json(const json& j, OutputSection& info) {
     info.alg_crop_output_path = j["alg_crop_output_path"];
     info.alg_dpc_output_path = j["alg_dpc_output_path"];
@@ -102,18 +148,5 @@ inline void from_json(const json& j, OutputSection& info) {
     info.hls_dpc_output_path = j["hls_dpc_output_path"];
 }
 
-inline void from_json(const json& j, RegisterSection& info) {
-    from_json(j["reg_image_width"], info.reg_image_width);
-    from_json(j["reg_image_height"], info.reg_image_height);
-    from_json(j["reg_smooth_filter_enable"], info.reg_smooth_filter_enable);
-    from_json(j["reg_smooth_filter_coeff"], info.reg_smooth_filter_coeff);
-    from_json(j["reg_dpc_enable"], info.reg_dpc_enable);
-    from_json(j["reg_dpc_threshold"], info.reg_dpc_threshold);
-    from_json(j["reg_crop_enable"], info.reg_crop_enable);
-    from_json(j["reg_crop_start_x"], info.reg_crop_start_x);
-    from_json(j["reg_crop_start_y"], info.reg_crop_start_y);
-    from_json(j["reg_crop_end_x"], info.reg_crop_end_x);
-    from_json(j["reg_crop_end_y"], info.reg_crop_end_y);
-}
 
 #endif

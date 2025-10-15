@@ -3,6 +3,7 @@
 
 // std
 #include <string>
+#include <vector>
 
 // ip
 #include <ap_int.h>
@@ -23,6 +24,7 @@ struct HlsRegisterSection {
     ap_uint<16> reg_crop_end_y;
     ap_uint<1>  reg_dpc_enable;
     ap_uint<16> reg_dpc_threshold;
+    vector<ap_uint<8>> reg_smooth_filter_coeff;
 };
 
 struct HlsImageSection {

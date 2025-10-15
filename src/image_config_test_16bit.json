@@ -1,0 +1,16 @@
+{
+  "image_format": {
+    "src_image_format": "BAYER",
+    "src_image_bitwidth": 16,
+    "generate_random_src_image_enable": 1
+  },
+  "image_pattern": {
+    "src_image_path": "data/src_image.txt",
+    "random_src_image_path": "data/src_image_random_generate_16bit.txt",
+    "alg_crop_output_path": "data/alg_crop_output_data.txt",
+    "alg_dpc_output_path": "data/alg_dpc_output_data.txt",
+    "py_dpc_output_path": "data/py_dpc_output_data.txt",
+    "hls_crop_output_path": "data/hls_crop_output_data.txt",
+    "hls_dpc_output_path": "data/hls_dpc_output_data.txt"
+  }
+}

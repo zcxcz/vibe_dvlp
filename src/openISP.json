@@ -1,0 +1,307 @@
+{
+  "image_info": {
+    "image_format": "BAYER",
+    "image_data_bitwidth": 8,
+    "generate_random_image": 1,
+    "image_path": "data/src_image.txt",
+    "random_image_path": "data/src_image_random_generate.txt"
+  },
+  "output_info": {
+    "alg_crop_output_path": "data/alg_crop_output_data.txt",
+    "alg_dpc_output_path": "data/alg_dpc_output_data.txt",
+    "hls_crop_output_path": "data/hls_crop_output_data.txt",
+    "hls_dpc_output_path": "data/hls_dpc_output_data.txt"
+  },
+  "register_info": {
+    "reg_image_width": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        32
+      ],
+      "reg_value_min": 1,
+      "reg_value_max": 32
+    },
+    "reg_image_height": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        32
+      ],
+      "reg_value_min": 1,
+      "reg_value_max": 32
+    },
+    "reg_smooth_filter_enable": {
+      "reg_bit_width": 1,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 1
+    },
+    "reg_smooth_filter_coeff": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        1,        2,        3,
+        4,        5,        6,
+        7,        8,        9
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_dpc_enable": {
+      "reg_bit_width": 1,
+      "reg_initial_value": [
+        1
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 1
+    },
+    "reg_dpc_threshold": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_crop_enable": {
+      "reg_bit_width": 1,
+      "reg_initial_value": [
+        1
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 1
+    },
+    "reg_crop_start_x": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 31
+    },
+    "reg_crop_start_y": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        2
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 31
+    },
+    "reg_crop_end_x": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        3
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 31
+    },
+    "reg_crop_end_y": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        4
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 31
+    },
+    "reg_dpc_mode": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 1
+    },
+    "reg_dpc_clip": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1023
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 65535
+    },
+    "reg_bl_r": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_bl_gr": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_bl_gb": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_bl_b": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_alpha": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_beta": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_blc_clip": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1023
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 65535
+    },
+    "reg_bayer_pattern": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 3
+    },
+    "reg_r_gain": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1536
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 4095
+    },
+    "reg_gr_gain": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1024
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 4095
+    },
+    "reg_gb_gain": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1024
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 4095
+    },
+    "reg_b_gain": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1126
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 4095
+    },
+    "reg_awb_clip": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1023
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 65535
+    },
+    "reg_cfa_mode": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        0
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 3
+    },
+    "reg_cfa_clip": {
+      "reg_bit_width": 16,
+      "reg_initial_value": [
+        1023
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 65535
+    },
+    "reg_hue": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        128
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_saturation": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        256
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_hsc_clip": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        255
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_brightness": {
+      "reg_bit_width": 9,
+      "reg_initial_value": [
+        10
+      ],
+      "reg_value_min": -255,
+      "reg_value_max": 255
+    },
+    "reg_contrast": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        10
+      ],
+      "reg_value_min": -32,
+      "reg_value_max": 128
+    },
+    "reg_bcc_clip": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        255
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_nlm_h": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        10
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    },
+    "reg_nlm_clip": {
+      "reg_bit_width": 8,
+      "reg_initial_value": [
+        255
+      ],
+      "reg_value_min": 0,
+      "reg_value_max": 255
+    }
+  }
+}
