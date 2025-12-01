@@ -33,9 +33,9 @@ class ISPImageGenarator:
             image_format = self.config.get("image_format", {})
             image_pattern = self.config.get("image_pattern", {})
             
-            self.src_image_format = image_format.get("src_image_format", "BAYER")
-            self.src_image_data_bitwidth = image_format.get("src_image_data_bitwidth", 8)
-            self.generate_random_enable = bool(image_format.get("generate_random_src_image_enable", 0))
+            self.src_image_format = image_format.get("isp_src_image_format", "BAYER")
+            self.src_image_data_bitwidth = image_format.get("isp_src_image_bitwidth", 8)
+            self.generate_random_enable = bool(image_format.get("isp_src_image_random_enable", 0))
             
             self.src_image_path = image_pattern.get("src_image_path", "data/src_image.txt")
             self.random_src_image_path = image_pattern.get("random_src_image_path", "data/src_image_random_generate.txt")

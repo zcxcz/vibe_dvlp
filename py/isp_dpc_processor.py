@@ -71,8 +71,8 @@ class ISPDPCProcessor:
                 config = json.load(jsonfile)
                 
             # Get output path for DPC result
-            json_output_path = config.get('image_pattern', {}).get('py_dpc_output_path', 
-                                                                  'data/py_dpc_output_data.txt')
+            json_output_path = config.get('image_pattern', {}).get('isp_py_dpc_output_path', 
+                                                                  'data/isp_py_dpc_dst_image.txt')
             # Convert to absolute path from project root
             self.output_path = os.path.join('..', json_output_path)
             print(f"Output path from JSON: {json_output_path}")
@@ -293,8 +293,8 @@ class ISPDPCProcessor:
 def main():
     """Main function"""
     # Default file paths - adjusted for py directory location
-    register_table_csv_path = "../src/register_table.csv"
-    src_image_config_json_path = "../src/image_config.json"
+    register_table_csv_path = "../config/register_table.csv"
+    src_image_config_json_path = "../config/image_config.json"
     random_src_image_path = "../data/src_image_random_generate.txt"
     
     # Parse command line arguments
