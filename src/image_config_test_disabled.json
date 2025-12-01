@@ -1,12 +1,12 @@
 {
   "image_format": {
     "src_image_format": "BAYER",
-    "src_image_bitwidth": 8,
+    "src_image_data_bitwidth": 8,
     "generate_random_src_image_enable": 0
   },
   "image_pattern": {
     "src_image_path": "data/src_image.txt",
-    "random_src_image_path": "data/src_image_random_generate_disabled.txt",
+    "random_src_image_path": "data/random_src_image.txt",
     "alg_crop_output_path": "data/alg_crop_output_data.txt",
     "alg_dpc_output_path": "data/alg_dpc_output_data.txt",
     "py_dpc_output_path": "data/py_dpc_output_data.txt",

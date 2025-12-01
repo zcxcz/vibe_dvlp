@@ -32,60 +32,26 @@ using namespace std;
 
 
 int main(const int argc, const char *argv[]) {
-    // try {
-        // 读取JSON配置 - 兼容不同构建目录
-    string config_path = "/home/sheldon/hls_project/vibe_crop/src/vibe.json";
-    ifstream f(config_path);
-    if (!f.is_open()) {
-        MAIN_INFO_1("Cannot open vibe.json configuration file");
-    }
-    MAIN_INFO_1("vibe.json configuration file path: " + config_path);
-    
-    json data = json::parse(f);
-    f.close();
-    MAIN_INFO_1("vibe.json configuration file parse follow...");
-    MAIN_INFO_1(data.dump(2));
-    
-    // json loading
-    MAIN_INFO_1("object: image_section parse follow...");
-    ImageSection image_section = data["image_info"].get<ImageSection>();
-    MAIN_INFO_1("object: output_section parse follow...");
-    OutputSection output_section = data["output_info"].get<OutputSection>();
-    // MAIN_INFO_1("object: register_section parse follow...");
-    // RegisterSection register_section = data["register_info"].get<RegisterSection>();
+    string register_table_csv_path = "../src/register_table.csv";
+    string image_config_json_path = "../src/image_config.json";
 
-    MAIN_INFO_1("object: image_section parse follow...");
+    MAIN_INFO_1("image_config json parse");
+    MAIN_INFO_1("image_config.image_section parse");
+    ImageSection image_section = LoadImageConfigJsonImageSection(image_config_json_path);
     image_section.print_values();
-    MAIN_INFO_1("object: output_section parse follow...");
+    MAIN_INFO_1("image_config.output_section parse");
+    OutputSection output_section = LoadImageConfigJsonOutputSection(image_config_json_path);
     output_section.print_values();
-    // MAIN_INFO_1("object: register_section parse follow...");
-    // register_section.print_values();
-    // register_section.randomize_check();
-
-    // csv loading
-    MAIN_INFO_1("object: register_section parse follow...");
-    RegisterSection register_section = data["register_info"].get<RegisterSection>();
+    MAIN_INFO_1("register_table.register_section parse");
+    RegisterSection register_section = LoadCSVFile(register_table_csv_path);
+    register_section.print_values();
     
-    int width = register_section.reg_map["reg_image_width"].reg_initial_value[0];
-    int height = register_section.reg_map["reg_image_height"].reg_initial_value[0];
+    int width = register_section.reg_map["reg_image_width"];
+    int height = register_section.reg_map["reg_image_height"];
     MAIN_INFO_1("image width: " + to_string(width));
     MAIN_INFO_1("image height: " + to_string(height));
 
-    // src image load
-    string source_image_path;
-    vector<ap_uint<HLS_INPUT_DATA_BITWIDTH>> input_image;
-    vector<ap_uint<HLS_OUTPUT_DATA_BITWIDTH>> output_image;
-    if (image_section.generate_random_image) {
-        source_image_path = image_section.random_image_path;
-    } else {
-        source_image_path = image_section.image_path;
-    }
-    MAIN_INFO_1("loading image: " + source_image_path);
-    input_image = vector_read_from_file<ap_uint<HLS_INPUT_DATA_BITWIDTH>>(source_image_path);
-    if (input_image.empty()) {
-        MAIN_ERROR_1("Cannot load image: " + source_image_path);
-    }
-
+    exit();
     // hls_top run
     MAIN_INFO_1("hls_top run...");
     HlsTop<ALG_INPUT_DATA_TYPE, ALG_OUTPUT_DATA_TYPE, HLS_INPUT_DATA_BITWIDTH, HLS_OUTPUT_DATA_BITWIDTH> hls_top;

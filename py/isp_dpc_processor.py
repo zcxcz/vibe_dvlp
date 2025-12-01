@@ -268,18 +268,18 @@ class ISPDPCProcessor:
             print(f"Error saving output data: {e}")
             sys.exit(1)
     
-    def process(self, register_csv_path: str, image_config_json_path: str, raw_image_path: str):
+    def process(self, register_table_csv_path: str, src_image_config_json_path: str, random_src_image_path: str):
         """Main processing pipeline"""
         print("=== Python ISP DPC Processing ===")
         
         # Step 1: Load register configuration
-        self.load_registers_from_csv(register_csv_path)
+        self.load_registers_from_csv(register_table_csv_path)
         
         # Step 2: Load image configuration
-        self.load_image_config(image_config_json_path)
+        self.load_image_config(src_image_config_json_path)
         
         # Step 3: Load RAW image data
-        input_image = self.load_raw_image_data(raw_image_path)
+        input_image = self.load_raw_image_data(random_src_image_path)
         
         # Step 4: Apply DPC processing
         output_image = self.apply_dpc_processing(input_image)
@@ -293,26 +293,53 @@ class ISPDPCProcessor:
 def main():
     """Main function"""
     # Default file paths - adjusted for py directory location
-    register_csv_path = "../src/register_table.csv"
-    image_config_json_path = "../src/image_config.json"
-    raw_image_path = "../data/src_image_random_generate.txt"
+    register_table_csv_path = "../src/register_table.csv"
+    src_image_config_json_path = "../src/image_config.json"
+    random_src_image_path = "../data/src_image_random_generate.txt"
+    
+    # Parse command line arguments
+    import argparse
+    parser = argparse.ArgumentParser(description='ISP DPC Processor')
+    parser.add_argument('--register', help='Path to register table CSV file')
+    parser.add_argument('--config', help='Path to image config JSON file')
+    parser.add_argument('register_pos', nargs='?', help='Register table CSV file path (positional)')
+    parser.add_argument('config_pos', nargs='?', help='Image config JSON file path (positional)')
+    parser.add_argument('image_pos', nargs='?', help='Input image data file path (positional)')
+    
+    args = parser.parse_args()
+    
+    # Use --register argument if provided, otherwise use positional argument
+    if args.register:
+        register_table_csv_path = args.register
+    elif args.register_pos:
+        register_table_csv_path = args.register_pos
+    
+    # Use --config argument if provided, otherwise use positional argument
+    if args.config:
+        src_image_config_json_path = args.config
+    elif args.config_pos:
+        src_image_config_json_path = args.config_pos
+        
+    # Use positional argument for image file if provided
+    if args.image_pos:
+        random_src_image_path = args.image_pos
     
     # Check if files exist
-    if not os.path.exists(register_csv_path):
-        print(f"Error: Register CSV file not found: {register_csv_path}")
+    if not os.path.exists(register_table_csv_path):
+        print(f"Error: Register CSV file not found: {register_table_csv_path}")
         sys.exit(1)
         
-    if not os.path.exists(image_config_json_path):
-        print(f"Error: Image config JSON file not found: {image_config_json_path}")
+    if not os.path.exists(src_image_config_json_path):
+        print(f"Error: Image config JSON file not found: {src_image_config_json_path}")
         sys.exit(1)
         
-    if not os.path.exists(raw_image_path):
-        print(f"Error: RAW image data file not found: {raw_image_path}")
+    if not os.path.exists(random_src_image_path):
+        print(f"Error: RAW image data file not found: {random_src_image_path}")
         sys.exit(1)
     
     # Create processor and run
-    processor = DPCProcessor()
-    processor.process(register_csv_path, image_config_json_path, raw_image_path)
+    processor = ISPDPCProcessor()
+    processor.process(register_table_csv_path, src_image_config_json_path, random_src_image_path)
 
 
 if __name__ == "__main__":

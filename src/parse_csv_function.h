@@ -15,15 +15,8 @@ using namespace std;
 
 
 // register_info struct
-struct RegisterInfo {
-    int reg_bit_width;
-    int reg_value_min;
-    int reg_value_max;
-    int reg_initial_value;
-};
-
 struct RegisterSection {
-    map<string, RegisterInfo> reg_map;
+    map<string, int> reg_map;
     
     void print_values() const;
 };
@@ -31,4 +24,4 @@ struct RegisterSection {
 // csv parser function
 extern void PrintCSVLine(const vector<string>& line_data);
 extern void PrintCSVFile();
-extern void LoadCSVFile();
+extern RegisterSection LoadCSVFile(const string& filename);

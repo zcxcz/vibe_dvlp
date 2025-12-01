@@ -4,42 +4,45 @@
 // std
 #include <string>
 #include <iostream>
-#include <random>
+#include <fstream>
 
 // tool
 #include "json.hpp"
+#include "print_function.h"
 
 using json = nlohmann::json;
 using namespace std;
 
 
 struct ImageSection {
-    string image_path;
-    string image_format;
-    int image_data_bitwidth;
-    int generate_random_image;
-    string random_image_path;
+    string src_image_format;
+    int src_image_data_bitwidth;
+    int generate_random_src_image_enable;
     
     void print_values() const {
         cout << "ImageSection:" << endl;
-        cout << "  image_path: " << image_path << endl;
-        cout << "  image_format: " << image_format << endl;
-        cout << "  image_data_bitwidth: " << image_data_bitwidth << endl;
-        cout << "  generate_random_image: " << generate_random_image << endl;
-        cout << "  random_image_path: " << random_image_path << endl;
+        cout << "  src_image_format: " << src_image_format << endl;
+        cout << "  src_image_data_bitwidth: " << src_image_data_bitwidth << endl;
+        cout << "  generate_random_src_image_enable: " << generate_random_src_image_enable << endl;
     }
 };
 
 struct OutputSection {
+    string src_image_path;
+    string random_src_image_path;
     string alg_crop_output_path;
     string alg_dpc_output_path;
+    string py_dpc_output_path;
     string hls_crop_output_path;
     string hls_dpc_output_path;
     
     void print_values() const {
         cout << "OutputSection:" << endl;
+        cout << "  src_image_path: " << src_image_path << endl;
+        cout << "  random_src_image_path: " << random_src_image_path << endl;
         cout << "  alg_crop_output_path: " << alg_crop_output_path << endl;
         cout << "  alg_dpc_output_path: " << alg_dpc_output_path << endl;
+        cout << "  py_dpc_output_path: " << py_dpc_output_path << endl;
         cout << "  hls_crop_output_path: " << hls_crop_output_path << endl;
         cout << "  hls_dpc_output_path: " << hls_dpc_output_path << endl;
     }
@@ -133,19 +136,42 @@ inline void from_json(const json& j, RegisterInfo& reg) {
     
 // image_info loading
 inline void from_json(const json& j, ImageSection& info) {
-    info.image_path = j["image_path"];
-    info.image_format = j["image_format"];
-    info.image_data_bitwidth = j["image_data_bitwidth"];
-    info.generate_random_image = j["generate_random_image"];
-    info.random_image_path = j["random_image_path"];
+    info.src_image_format = j["src_image_format"];
+    info.src_image_data_bitwidth = j["src_image_data_bitwidth"];
+    info.generate_random_src_image_enable = j["generate_random_src_image_enable"];
 }
 
 // output_info loading
 inline void from_json(const json& j, OutputSection& info) {
+    info.src_image_path = j["src_image_path"];
+    info.random_src_image_path = j["random_src_image_path"];
     info.alg_crop_output_path = j["alg_crop_output_path"];
     info.alg_dpc_output_path = j["alg_dpc_output_path"];
+    info.py_dpc_output_path = j["py_dpc_output_path"];
     info.hls_crop_output_path = j["hls_crop_output_path"];
     info.hls_dpc_output_path = j["hls_dpc_output_path"];
+}
+
+inline ImageSection LoadImageConfigJsonImageSection(const string& filename) {
+    ifstream f(filename);
+    if (!f.is_open()) {
+        MAIN_ERROR_1("Cannot open image_config.json configuration file");
+    }
+    json data = json::parse(f);
+    f.close();
+    ImageSection image_section = data["image_info"].get<ImageSection>();
+    return image_section;
+}
+
+inline OutputSection LoadImageConfigJsonOutputSection(const string& filename) {
+    ifstream f(filename);
+    if (!f.is_open()) {
+        MAIN_ERROR_1("Cannot open image_config.json configuration file");
+    }
+    json data = json::parse(f);
+    f.close();
+    OutputSection output_section = data["output_info"].get<OutputSection>();
+    return output_section;
 }
 
 

@@ -48,14 +48,14 @@ void LoadCSVFile(RegisterSection &register_section) {
        while (getline(line_stream, field, ',')) {
            fields.push_back(field);
        }
-       RegisterInfo reg_info;
-       reg_info.reg_bit_width = stoi(fields[2]);
-       reg_info.reg_initial_value = stoi(fields[3]);
-       reg_info.reg_value_min = stoi(fields[4]);
-       reg_info.reg_value_max = stoi(fields[5]);
+    //    RegisterInfo reg_info;
+    //    reg_info.reg_bit_width = stoi(fields[2]);
+    //    reg_info.reg_initial_value = stoi(fields[3]);
+    //    reg_info.reg_value_min = stoi(fields[4]);
+    //    reg_info.reg_value_max = stoi(fields[5]);
        // Print or process the extracted fields
        // PrintCSVLine(fields);
-       register_section.reg_map[fields[1]] = reg_info;
+       register_section.reg_map[fields[1]] = stoi(fields[2]);
    }
    register_section.print_values();
    csv_file.close();

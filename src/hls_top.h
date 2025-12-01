@@ -59,17 +59,17 @@ public:
 
 
     // section operation
-    void loadRegisterSection(RegisterSection& register_section) {
+    void loadRegisterSection(const RegisterSection& register_section) {
         MAIN_INFO_1("Register Section loading...");
-        hls_register_section.reg_image_width = ap_uint<16>(register_section.reg_map["reg_image_width"].reg_initial_value[0]);
-        hls_register_section.reg_image_height = ap_uint<16>(register_section.reg_map["reg_image_height"].reg_initial_value[0]);
-        hls_register_section.reg_crop_enable = (register_section.reg_map["reg_crop_enable"].reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
-        hls_register_section.reg_crop_start_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_start_x"].reg_initial_value[0]));
-        hls_register_section.reg_crop_start_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_start_y"].reg_initial_value[0]));
-        hls_register_section.reg_crop_end_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_end_x"].reg_initial_value[0]));
-        hls_register_section.reg_crop_end_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_end_y"].reg_initial_value[0]));
-        hls_register_section.reg_dpc_enable = (register_section.reg_map["reg_dpc_enable"].reg_initial_value[0] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
-        hls_register_section.reg_dpc_threshold = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_dpc_threshold"].reg_initial_value[0]));
+        hls_register_section.reg_image_width = ap_uint<16>(register_section.reg_map["reg_image_width"]);
+        hls_register_section.reg_image_height = ap_uint<16>(register_section.reg_map["reg_image_height"]);
+        hls_register_section.reg_crop_enable = (register_section.reg_map["reg_crop_enable"] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
+        hls_register_section.reg_crop_start_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_start_x"]));
+        hls_register_section.reg_crop_start_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_start_y"]));
+        hls_register_section.reg_crop_end_x = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_end_x"]));
+        hls_register_section.reg_crop_end_y = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_crop_end_y"]));
+        hls_register_section.reg_dpc_enable = (register_section.reg_map["reg_dpc_enable"] > 0) ? ap_uint<1>(1) : ap_uint<1>(0);
+        hls_register_section.reg_dpc_threshold = ap_uint<16>(static_cast<unsigned short>(register_section.reg_map["reg_dpc_threshold"]));
     }
 
     void loadImageSection(const ImageSection& image_section) {
